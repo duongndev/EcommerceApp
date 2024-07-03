@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+
+    <color name="primary900">#1A1A1A</color>
+    <color name="primary800">#333333</color>
+    <color name="primary700">#4D4D4D</color>
+    <color name="primary600">#666666</color>
+    <color name="primary500">#808080</color>
+    <color name="primary400">#999999</color>
+    <color name="primary300">#B3B3B3</color>
+    <color name="primary200">#CCCCCC</color>
+    <color name="primary100">#E6E6E6</color>
+    <color name="primary50">#F2F2F2</color>
+
+    <color name="success_green">#0C9409</color>
+    <color name="error_red">#ED1010</color>
+</resources>

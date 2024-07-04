@@ -7,7 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.duongnd.ecommerceapp.R
 import com.duongnd.ecommerceapp.databinding.ActivityMainBinding
-import com.duongnd.ecommerceapp.view.account.AccountFragment
+import com.duongnd.ecommerceapp.ui.account.AccountFragment
 import com.duongnd.ecommerceapp.ui.cart.CartFragment
 import com.duongnd.ecommerceapp.ui.home.HomeFragment
 import com.duongnd.ecommerceapp.ui.saved.SavedFragment

@@ -71,13 +71,13 @@ dependencies {
     implementation ("androidx.navigation:navigation-dynamic-features-fragment:2.7.7")
 
     // ViewModel - LiveData
-    implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.0")
-    implementation ("androidx.lifecycle:lifecycle-viewmodel-savedstate:2.8.0")
-    implementation ("androidx.lifecycle:lifecycle-common-java8:2.8.0")
-    implementation ("androidx.lifecycle:lifecycle-livedata-ktx:2.8.0")
-    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.8.0")
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.3")
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-savedstate:2.8.3")
+    implementation ("androidx.lifecycle:lifecycle-common-java8:2.8.3")
+    implementation ("androidx.lifecycle:lifecycle-livedata-ktx:2.8.3")
+    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.8.3")
     //noinspection LifecycleAnnotationProcessorWithJava8
-    kapt ("androidx.lifecycle:lifecycle-compiler:2.8.0")
+    kapt ("androidx.lifecycle:lifecycle-compiler:2.8.3")
 
     // retrofit - okhttp
     implementation ("com.squareup.retrofit2:retrofit:2.11.0")

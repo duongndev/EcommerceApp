@@ -2,7 +2,7 @@ package com.duongnd.ecommerceapp.data.model.product
 
 data class DataProduct(
     val _id: String,
-    val categoryId: String,
+    val categoryId: CategoryId,
     val countInStock: Int,
     val createdAt: String,
     val description: String,

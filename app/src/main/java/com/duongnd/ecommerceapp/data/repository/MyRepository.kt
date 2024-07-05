@@ -1,9 +1,12 @@
 package com.duongnd.ecommerceapp.data.repository
 
+import android.util.Log
 import com.duongnd.ecommerceapp.data.api.ApiService
+import com.duongnd.ecommerceapp.data.model.cart.Cart
 import com.duongnd.ecommerceapp.data.model.product.DataProduct
 import com.duongnd.ecommerceapp.data.model.product.ProductDetail
 import com.duongnd.ecommerceapp.data.model.product.Products
+import com.duongnd.ecommerceapp.data.request.AddToCartRequest
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -46,6 +49,25 @@ class MyRepository(private val apiService: ApiService) {
 
 
 
+    fun addToCart(token: String, addToCartRequest: AddToCartRequest, onDataCartListener: onDataCartListener) {
+        apiService.addCart(token, addToCartRequest).enqueue(object : Callback<Cart> {
+            override fun onResponse(p0: Call<Cart>, p1: Response<Cart>) {
+                if (p1.isSuccessful) {
+                    val cart = p1.body()
+                    onDataCartListener.onDataSuccess(cart!!)
+                } else {
+                    onDataCartListener.onDataFail(p1.errorBody().toString())
+                }
+            }
+
+            override fun onFailure(p0: Call<Cart>, p1: Throwable) {
+                onDataCartListener.onDataFail(p1.message!!)
+            }
+
+        })
+    }
+
+
     interface onDataProductsListener {
         fun onDataSuccess(products: ArrayList<DataProduct>)
         fun onFail(error: String)
@@ -61,4 +83,8 @@ class MyRepository(private val apiService: ApiService) {
         fun onDataFail(error: String)
     }
 
+    interface onDataCartListener {
+        fun onDataSuccess(car: Cart)
+        fun onDataFail(error: String)
+    }
 }

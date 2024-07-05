@@ -7,6 +7,7 @@ import com.duongnd.ecommerceapp.data.model.login.LoginRequest
 import com.duongnd.ecommerceapp.data.model.product.ProductDetail
 import com.duongnd.ecommerceapp.data.model.product.Products
 import com.duongnd.ecommerceapp.data.model.user.User
+import com.duongnd.ecommerceapp.data.request.AddToCartRequest
 import com.duongnd.ecommerceapp.data.request.CartItemRequest
 import retrofit2.Call
 import retrofit2.http.Body
@@ -39,15 +40,10 @@ interface ApiService {
         @Header("Authorization") token: String
     ): Call<Cart>
 
-    @GET("/cart/")
+    @POST("/cart/")
     fun addCart(
         @Header("Authorization") token: String,
-        @Body
-        userId: String,
-        @Body
-        productId: String,
-        @Body
-        quantity: Int
+        @Body addToCartRequest: AddToCartRequest
     ) : Call<Cart>
 
     @PUT("/cart/increment/{id}")

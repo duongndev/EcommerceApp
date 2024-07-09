@@ -12,7 +12,9 @@ import com.duongnd.ecommerceapp.ui.cart.CartFragment
 import com.duongnd.ecommerceapp.ui.home.HomeFragment
 import com.duongnd.ecommerceapp.ui.saved.SavedFragment
 import com.duongnd.ecommerceapp.view.search.SearchFragment
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding

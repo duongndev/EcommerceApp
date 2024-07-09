@@ -9,6 +9,7 @@ class SessionManager {
     private val KEY_USER_ID = "user_id"
     private val KEY_IS_LOGGED_IN = "is_logged_in"
     private val KEY_TOKEN = ""
+    private val KEY_ADDRESS_ID = ""
 
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var editor: SharedPreferences.Editor
@@ -39,6 +40,15 @@ class SessionManager {
     }
 
 
+    fun setAddressId(userId: String, addressId: String) {
+        editor.putString(KEY_USER_ID, userId)
+        editor.putString(KEY_ADDRESS_ID, addressId)
+        editor.apply()
+    }
+
+    fun getAddressId(): String? {
+        return sharedPreferences.getString(KEY_USER_ID, "")
+    }
     fun isLoggedIn(): Boolean {
         return sharedPreferences.getBoolean(KEY_IS_LOGGED_IN, false)
     }

@@ -29,7 +29,8 @@ import com.google.android.material.chip.ChipGroup
 
 class HomeFragment : Fragment() {
 
-    private lateinit var binding: FragmentHomeBinding
+    private var _binding: FragmentHomeBinding? = null
+    private val binding get() = _binding!!
     private lateinit var homeAdapter: HomeAdapter
     private var productList = ArrayList<DataProduct>()
     private var isImageHeartSelected = false
@@ -47,7 +48,7 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        binding = FragmentHomeBinding.inflate(inflater, container, false)
+        _binding = FragmentHomeBinding.inflate(inflater, container, false)
 
         homeAdapter = HomeAdapter(productList, requireContext())
 
@@ -209,7 +210,7 @@ class HomeFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         Log.d(TAG, "onDestroyView: destroy")
-
+        _binding = null
     }
 
     override fun onDestroy() {

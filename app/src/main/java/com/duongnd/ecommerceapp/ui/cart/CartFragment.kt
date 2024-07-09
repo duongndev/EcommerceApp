@@ -3,6 +3,8 @@ package com.duongnd.ecommerceapp.ui.cart
 import android.content.Intent
 import android.graphics.Canvas
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -20,6 +22,7 @@ import com.duongnd.ecommerceapp.data.repository.CartRepository
 import com.duongnd.ecommerceapp.data.request.CartItemRequest
 import com.duongnd.ecommerceapp.databinding.FragmentCartBinding
 import com.duongnd.ecommerceapp.ui.checkout.CheckoutActivity
+import com.duongnd.ecommerceapp.utils.CustomProgressDialog
 import com.duongnd.ecommerceapp.utils.SessionManager
 import com.duongnd.ecommerceapp.viewmodel.cart.CartViewModel
 import com.duongnd.ecommerceapp.viewmodel.cart.CartViewModelFactory
@@ -35,6 +38,8 @@ class CartFragment : Fragment() {
     private val cartViewModel: CartViewModel by viewModels {
         CartViewModelFactory(CartRepository(apiService = RetrofitClient.apiService))
     }
+
+    private val progressDialog by lazy { CustomProgressDialog(requireContext()) }
 
     val TAG = "CartFragment"
     var cartId: String = ""
@@ -60,36 +65,23 @@ class CartFragment : Fragment() {
 
         val userId = sessionManager.getUserId()!!
         val token = sessionManager.getToken()!!
-        cartViewModel.getUserCart(userId, token)
-        cartViewModel._liveDataCart.observe(viewLifecycleOwner, Observer {
-            Log.d(TAG, "onViewCreated: $it")
-            if (it.itemsCart.isEmpty()) {
-                binding.layoutCartEmpty.visibility = View.VISIBLE
-                binding.nestedScrollViewCart.visibility = View.GONE
-                binding.layoutTotalCart.visibility = View.GONE
-                binding.btnCheckoutDetail.visibility = View.GONE
-            } else {
-                binding.layoutCartEmpty.visibility = View.GONE
-                binding.nestedScrollViewCart.visibility = View.VISIBLE
-                binding.layoutTotalCart.visibility = View.VISIBLE
-                binding.btnCheckoutDetail.visibility = View.VISIBLE
-                cartId = it._id
-                cartItemList.clear()
-                cartItemList.addAll(it.itemsCart)
-                val formatPrice = it.totalAmount.toString().replace("\\D+".toRegex(), "")
-                    .toLong().toString().replace("\\B(?=(\\d{3})+(?!\\d))".toRegex(), ",")
-                binding.txtSubtotalValue.text = "$formatPrice vnđ"
-                cartAdapter.notifyDataSetChanged()
-            }
-        })
+
+        progressDialog.start("Loading Cart...")
+
+
+        Handler(Looper.getMainLooper()).postDelayed({
+            getCartItemList(userId, token)
+        }, 2000)
 
         cartAdapter.incrementQuantity = {
             val productId = CartItemRequest(it.productId)
             incrementQuantity(cartId, token, productId)
+            cartAdapter.notifyDataSetChanged()
         }
         cartAdapter.decrementQuantity = {
             val productId = it.productId
             decrementQuantity(cartId, token, CartItemRequest(productId))
+            cartAdapter.notifyDataSetChanged()
         }
 
         cartAdapter.deleteCart = {
@@ -107,6 +99,37 @@ class CartFragment : Fragment() {
             startActivity(intent)
         }
 
+    }
+
+    private fun getCartItemList(userId: String, token: String) {
+        cartViewModel.getUserCart(userId, token)
+        cartViewModel._liveDataCart.observe(viewLifecycleOwner, Observer {
+            Log.d(TAG, "onViewCreated: $it")
+            if (it.itemsCart.isEmpty()) {
+                progressDialog.stop()
+                binding.layoutCartEmpty.visibility = View.VISIBLE
+                binding.nestedScrollViewCart.visibility = View.GONE
+                binding.layoutTotalCart.visibility = View.GONE
+                binding.btnCheckoutDetail.visibility = View.GONE
+            } else {
+                binding.layoutCartEmpty.visibility = View.GONE
+                binding.nestedScrollViewCart.visibility = View.VISIBLE
+                binding.layoutTotalCart.visibility = View.VISIBLE
+                binding.btnCheckoutDetail.visibility = View.VISIBLE
+                cartId = it._id
+                cartItemList.clear()
+                cartItemList.addAll(it.itemsCart)
+                val formatPrice = it.totalAmount.toString().replace("\\D+".toRegex(), "")
+                    .toLong().toString().replace("\\B(?=(\\d{3})+(?!\\d))".toRegex(), ",")
+                binding.txtSubtotalValue.text = "$formatPrice vnđ"
+                cartAdapter.notifyDataSetChanged()
+                progressDialog.stop()
+            }
+        })
+        cartViewModel.error.observe(viewLifecycleOwner, Observer {
+            progressDialog.stop()
+            binding.layoutCartEmpty.visibility = View.VISIBLE
+        })
     }
 
     private fun incrementQuantity(id: String, token: String, cartItemRequest: CartItemRequest) {
@@ -137,16 +160,13 @@ class CartFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        cartAdapter.incrementQuantity = null
-        cartAdapter.decrementQuantity = null
-        cartAdapter.deleteCart = null
+        Log.d(TAG, "onDestroyView: destroy")
+
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        cartAdapter.incrementQuantity = null
-        cartAdapter.decrementQuantity = null
-        cartAdapter.deleteCart = null
+        Log.d(TAG, "onDestroy: destroy")
     }
 
 }

@@ -1,15 +1,20 @@
 package com.duongnd.ecommerceapp.data.api
 
+import com.duongnd.ecommerceapp.data.model.address.Address
 import com.duongnd.ecommerceapp.data.model.cart.Cart
 import com.duongnd.ecommerceapp.data.model.category.Category
 import com.duongnd.ecommerceapp.data.model.login.DataLogin
 import com.duongnd.ecommerceapp.data.model.login.LoginRequest
+import com.duongnd.ecommerceapp.data.model.order.Order
+import com.duongnd.ecommerceapp.data.model.product.DataProduct
 import com.duongnd.ecommerceapp.data.model.product.ProductDetail
 import com.duongnd.ecommerceapp.data.model.product.Products
 import com.duongnd.ecommerceapp.data.model.user.User
 import com.duongnd.ecommerceapp.data.request.AddToCartRequest
 import com.duongnd.ecommerceapp.data.request.CartItemRequest
+import com.duongnd.ecommerceapp.data.request.OrderItemRequest
 import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
@@ -22,6 +27,9 @@ interface ApiService {
     // products
     @GET("/products")
     fun getAllProducts(): Call<Products>
+
+    @GET("/products")
+   suspend fun getAllProducts2(): Response<Products>
 
     @GET("/products/{id}")
     fun getProductsById(
@@ -77,5 +85,19 @@ interface ApiService {
     // categories
     @GET("/categories")
     fun getAllCategories(): Call<Category>
+
+
+    @GET("/addresses/user/{id}")
+    fun getAllAddresses(
+        @Header("Authorization") token: String,
+        @Path("id") id: String
+    ): Call<Address>
+
+    //order
+    @POST("/orders")
+    fun addOrder(
+        @Header("Authorization") token: String,
+        @Body orderItemRequest: OrderItemRequest
+    ): Call<Order>
 
 }

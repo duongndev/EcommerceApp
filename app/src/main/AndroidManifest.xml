@@ -17,6 +17,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.EcommerceApp"
         android:usesCleartextTraffic="true"
+        android:name=".AppApplication"
         tools:targetApi="31">
         <activity
             android:name=".ui.checkout.CheckoutActivity"

@@ -3,6 +3,8 @@ package com.duongnd.ecommerceapp.ui.auth.login
 import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -19,6 +21,7 @@ import com.duongnd.ecommerceapp.data.model.login.LoginRequest
 import com.duongnd.ecommerceapp.data.repository.AuthRepository
 import com.duongnd.ecommerceapp.databinding.FragmentLoginBinding
 import com.duongnd.ecommerceapp.ui.MainActivity
+import com.duongnd.ecommerceapp.utils.CustomProgressDialog
 import com.duongnd.ecommerceapp.utils.SessionManager
 import com.duongnd.ecommerceapp.view.auth.signup.SignupFragment
 import com.duongnd.ecommerceapp.viewmodel.auth.login.LoginViewModel
@@ -32,6 +35,7 @@ class LoginFragment : Fragment() {
     private val loginViewModel: LoginViewModel by viewModels {
         LoginViewModelFactory(AuthRepository(apiService = RetrofitClient.apiService))
     }
+    private val progressDialog by lazy { CustomProgressDialog(requireContext()) }
 
     val TAG = "LoginFragment"
 
@@ -94,45 +98,51 @@ class LoginFragment : Fragment() {
                 binding.inputLayoutEmailLogin.error = null
                 binding.inputLayoutPasswordLogin.error = null
                 val loginRequest = LoginRequest(email, password)
-                getLogin(loginRequest)
+                Handler(Looper.getMainLooper()).postDelayed({
+                    progressDialog.start("Loading...")
+                    getLogin(loginRequest)
+                }, 3000)
+
             }
         }
     }
 
     private fun getLogin(login: LoginRequest) {
-        loginViewModel.getLogin(login)
-        loginViewModel._liveDataLogin.observe(viewLifecycleOwner) {
-            val builder = AlertDialog.Builder(requireContext()).create()
-            builder.setTitle("Login")
-            Log.d(TAG, "getLogin: $it")
-            if (it.success) {
-                Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
-                builder.dismiss()
-            } else {
-                binding.edtEmailLogin.setText("")
-                binding.edtPasswordLogin.setText("")
-                binding.inputLayoutEmailLogin.error = null
-                binding.inputLayoutPasswordLogin.error = null
-                sessionManager.setToken(it.token)
-                sessionManager.setUserId(it.userId)
-                builder.dismiss()
-                startActivity(Intent(requireContext(), MainActivity::class.java))
-                requireActivity().finish()
+        Handler(Looper.getMainLooper()).postDelayed({
+            loginViewModel.getLogin(login)
+            loginViewModel._liveDataLogin.observe(viewLifecycleOwner) {
+                Log.d(TAG, "getLogin: $it")
+                if (it.success) {
+                    Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
+                } else {
+                    binding.edtEmailLogin.setText("")
+                    binding.edtPasswordLogin.setText("")
+                    binding.inputLayoutEmailLogin.error = null
+                    binding.inputLayoutPasswordLogin.error = null
+                    sessionManager.setToken(it.token)
+                    sessionManager.setUserId(it.userId)
+                    startActivity(Intent(requireContext(), MainActivity::class.java))
+                    requireActivity().finish()
+                }
+                progressDialog.stop()
             }
-            builder.show()
-        }
+            loginViewModel.error.observe(viewLifecycleOwner, Observer {
+                progressDialog.stop()
+                Log.d(TAG, "error: $it")
+                if (it.equals("User not found")) {
+                    binding.inputLayoutEmailLogin.error = it
+                } else if (it.equals("Password is incorrect")) {
+                    binding.inputLayoutPasswordLogin.error = it
+                } else {
+                    binding.inputLayoutEmailLogin.error = null
+                    binding.inputLayoutPasswordLogin.error = null
+                }
+            })
+        }, 3000)
 
-        loginViewModel.error.observe(viewLifecycleOwner, Observer {
-            Log.d(TAG, "error: $it")
-            if (it.equals("User not found")) {
-                binding.inputLayoutEmailLogin.error = it
-            } else if (it.equals("Password is incorrect")) {
-                binding.inputLayoutPasswordLogin.error = it
-            } else {
-                binding.inputLayoutEmailLogin.error = null
-                binding.inputLayoutPasswordLogin.error = null
-            }
-        })
+
+
+
     }
 
 }

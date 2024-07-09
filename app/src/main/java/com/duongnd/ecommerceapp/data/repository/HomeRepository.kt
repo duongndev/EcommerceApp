@@ -1,5 +1,6 @@
 package com.duongnd.ecommerceapp.data.repository
 
+import android.util.Log
 import com.duongnd.ecommerceapp.data.api.ApiService
 import com.duongnd.ecommerceapp.data.model.category.Category
 import com.duongnd.ecommerceapp.data.model.category.DataCategory
@@ -16,6 +17,7 @@ class HomeRepository(private val apiService: ApiService) {
             override fun onResponse(call: Call<Products>, response: Response<Products>) {
                 if (response.isSuccessful) {
                     onDataProductsListener.onDataSuccess(response.body()!!.data)
+                    Log.d("TAG", "onResponse: ${response.body()!!.data}")
                 } else {
                     onDataProductsListener.onDataFail(response.message())
                 }

@@ -17,9 +17,11 @@ import com.duongnd.ecommerceapp.utils.SessionManager
 import com.duongnd.ecommerceapp.view.auth.AuthActivity
 import com.duongnd.ecommerceapp.viewmodel.auth.user.UserLoginViewModel
 import com.duongnd.ecommerceapp.viewmodel.auth.user.UserLoginViewModelFactory
+import dagger.hilt.android.AndroidEntryPoint
 import org.json.JSONObject
 import java.util.Date
 
+@AndroidEntryPoint
 @SuppressLint("CustomSplashScreen")
 class SplashActivity : AppCompatActivity() {
 

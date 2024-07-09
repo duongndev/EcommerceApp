@@ -40,6 +40,7 @@
                     android:textSize="16sp" />
 
                 <TextView
+                    android:id="@+id/txt_change_address"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/general_sans_medium"
@@ -76,7 +77,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/general_sans_semibold"
-                        android:text="Home"
+                        android:text=""
                         android:textColor="@color/primary900"
                         android:textSize="14sp" />
 
@@ -85,9 +86,18 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/general_sans_regular"
-                        android:text="925 S Chugach St #APT 10, Alaska 99645, USA"
+                        android:text=""
                         android:textColor="@color/primary900"
                         android:textSize="14sp" />
+                    <TextView
+                        android:id="@+id/txt_delivery_address_phone"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/general_sans_regular"
+                        android:text=""
+                        android:textColor="@color/primary900"
+                        android:textSize="14sp" />
+
                 </LinearLayout>
             </LinearLayout>
 
@@ -169,7 +179,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:fontFamily="@font/general_sans_medium"
-                    android:text="Tổng tiền:"
+                    android:text="Toal Price:"
                     android:textSize="24sp" />
 
                 <TextView

@@ -4,31 +4,34 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
-import com.duongnd.ecommerceapp.data.api.RetrofitClient
-import com.duongnd.ecommerceapp.data.repository.MyRepository
+import com.duongnd.ecommerceapp.data.repository.CartRepository
+import com.duongnd.ecommerceapp.data.repository.ProductsRepository
 import com.duongnd.ecommerceapp.data.request.AddToCartRequest
 import com.duongnd.ecommerceapp.databinding.FragmentDetailBinding
+import com.duongnd.ecommerceapp.di.AppModule
 import com.duongnd.ecommerceapp.ui.MainActivity
+import com.duongnd.ecommerceapp.utils.CustomProgressDialog
 import com.duongnd.ecommerceapp.utils.SessionManager
 import com.duongnd.ecommerceapp.viewmodel.detail.DetailViewModel
 import com.duongnd.ecommerceapp.viewmodel.detail.DetailViewModelFactory
+import timber.log.Timber
 
 class DetailFragment : Fragment() {
 
     private lateinit var binding: FragmentDetailBinding
     private val sessionManager = SessionManager()
 
-    private val detailViewModel: DetailViewModel by viewModels {
-        DetailViewModelFactory(MyRepository(apiService = RetrofitClient.apiService))
+    private val detailViewModel: DetailViewModel by viewModels{
+        DetailViewModelFactory(ProductsRepository(ecommerceApiService = AppModule.provideApi()))
     }
+
+    private val progressDialog by lazy { CustomProgressDialog(requireContext()) }
 
     private var TAG = "DetailFragment"
     private var productId: String = ""
@@ -72,6 +75,7 @@ class DetailFragment : Fragment() {
             val token = sessionManager.getToken()!!
             val userId = sessionManager.getUserId()!!
             val quantity = binding.txtQuantityProductDetail.text.toString().toInt()
+            progressDialog.start("Đang thêm sản phẩm vào giỏ hàng...")
             addProductToCart(token, AddToCartRequest(userId, productId, quantity))
         }
     }
@@ -79,15 +83,26 @@ class DetailFragment : Fragment() {
     @SuppressLint("SetTextI18n")
     private fun getProductById(id: String) {
         Handler(Looper.getMainLooper()).postDelayed({
-            detailViewModel.geDataProductById(id)
-            detailViewModel._liveDataProductDetail.observe(viewLifecycleOwner, Observer {
-                Log.d(TAG, "getProductById: $it")
-                productId = it._id
-                binding.txtTitleProductDetail.text = it.name_product
-                binding.txtPriceProductDetail.text = it.price.toString() + " VND"
-                binding.txtDescriptionProductDetail.text = it.description
-                showLoading(false)
-            })
+            with(detailViewModel) {
+                detailViewModel.getProductById(id)
+                productsDetailList.observe(viewLifecycleOwner) {
+                    productId = it._id
+                    binding.txtTitleProductDetail.text = it.name_product
+                    binding.txtPriceProductDetail.text = it.price.toString()
+                    binding.txtDescriptionProductDetail.text = it.description
+                    showLoading(false)
+
+                }
+                errorMessage.observe(viewLifecycleOwner) {
+                    showLoading(false)
+                    progressDialog.stop()
+                    Timber.tag(TAG).d("getProductById: " + it)
+                    Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+                }
+                loading.observe(viewLifecycleOwner) {
+                    showLoading(it)
+                }
+            }
         }, 2000)
     }
 
@@ -104,11 +119,22 @@ class DetailFragment : Fragment() {
     }
 
     private fun addProductToCart(token: String, addToCartRequest: AddToCartRequest) {
-        detailViewModel.addToCart(token, addToCartRequest)
-        detailViewModel._liveDataCart.observe(viewLifecycleOwner, Observer {
-            Log.d(TAG, "onViewCreated: $it")
-            Toast.makeText(context, "Thêm vào giỏ hàng thành công", Toast.LENGTH_SHORT).show()
-        })
+        with(detailViewModel) {
+            addToCart(token, addToCartRequest)
+            cartItem.observe(viewLifecycleOwner) {
+                Timber.tag(TAG).d("addToCart: " + it)
+                Toast.makeText(context, "Thêm vào giỏ hàng thành công", Toast.LENGTH_SHORT).show()
+                progressDialog.stop()
+            }
+            errorMessage.observe(viewLifecycleOwner) {
+                progressDialog.stop()
+                Timber.tag(TAG).d("addToCart: " + it)
+                Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+            }
+            loading.observe(viewLifecycleOwner) {
+                if (it) progressDialog.start("Loading....")
+            }
+        }
     }
 
     override fun onDestroyView() {

@@ -16,8 +16,7 @@ class HomeRepository(private val apiService: ApiService) {
         apiService.getAllProducts().enqueue(object : Callback<Products> {
             override fun onResponse(call: Call<Products>, response: Response<Products>) {
                 if (response.isSuccessful) {
-                    onDataProductsListener.onDataSuccess(response.body()!!.data)
-                    Log.d("TAG", "onResponse: ${response.body()!!.data}")
+                    onDataProductsListener.onDataSuccess(response.body()!!)
                 } else {
                     onDataProductsListener.onDataFail(response.message())
                 }
@@ -35,7 +34,7 @@ class HomeRepository(private val apiService: ApiService) {
         apiService.getAllCategories().enqueue(object: Callback<Category> {
             override fun onResponse(call: Call<Category>, response: Response<Category>) {
                 if (response.isSuccessful) {
-                    onDataCategoriesListener.onDataSuccess(response.body()!!.data)
+                    onDataCategoriesListener.onDataSuccess(response.body()!!)
                 } else {
                     onDataCategoriesListener.onDataFail(response.errorBody().toString())
                 }
@@ -52,7 +51,7 @@ class HomeRepository(private val apiService: ApiService) {
         apiService.getProductsByCategoryId(name).enqueue(object: Callback<Products> {
             override fun onResponse(call: Call<Products>, response: Response<Products>) {
                 if (response.isSuccessful) {
-                    onDataProductsListener.onDataSuccess(response.body()!!.data)
+                    onDataProductsListener.onDataSuccess(response.body()!!)
                 } else {
                     onDataProductsListener.onDataFail(response.errorBody().toString())
                 }

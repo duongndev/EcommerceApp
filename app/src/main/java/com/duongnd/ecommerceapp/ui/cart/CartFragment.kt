@@ -16,11 +16,13 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.duongnd.ecommerceapp.adapter.CartAdapter
+import com.duongnd.ecommerceapp.data.api.EcommerceApiService
 import com.duongnd.ecommerceapp.data.api.RetrofitClient
 import com.duongnd.ecommerceapp.data.model.cart.ItemCart
 import com.duongnd.ecommerceapp.data.repository.CartRepository
 import com.duongnd.ecommerceapp.data.request.CartItemRequest
 import com.duongnd.ecommerceapp.databinding.FragmentCartBinding
+import com.duongnd.ecommerceapp.di.AppModule
 import com.duongnd.ecommerceapp.ui.checkout.CheckoutActivity
 import com.duongnd.ecommerceapp.utils.CustomProgressDialog
 import com.duongnd.ecommerceapp.utils.SessionManager
@@ -35,8 +37,8 @@ class CartFragment : Fragment() {
     private var cartItemList = ArrayList<ItemCart>()
     private val sessionManager = SessionManager()
 
-    private val cartViewModel: CartViewModel by viewModels {
-        CartViewModelFactory(CartRepository(apiService = RetrofitClient.apiService))
+    private val cartViewModel: CartViewModel by viewModels{
+        CartViewModelFactory(CartRepository(ecommerceApiService = AppModule.provideApi()))
     }
 
     private val progressDialog by lazy { CustomProgressDialog(requireContext()) }
@@ -68,20 +70,19 @@ class CartFragment : Fragment() {
 
         progressDialog.start("Loading Cart...")
 
-
         Handler(Looper.getMainLooper()).postDelayed({
             getCartItemList(userId, token)
         }, 2000)
 
         cartAdapter.incrementQuantity = {
-            val productId = CartItemRequest(it.productId)
-            incrementQuantity(cartId, token, productId)
-            cartAdapter.notifyDataSetChanged()
+//            val productId = CartItemRequest(it.productId)
+//            incrementQuantity(cartId, token, productId)
+//            cartAdapter.notifyDataSetChanged()
         }
         cartAdapter.decrementQuantity = {
-            val productId = it.productId
-            decrementQuantity(cartId, token, CartItemRequest(productId))
-            cartAdapter.notifyDataSetChanged()
+//            val productId = it.productId
+//            decrementQuantity(cartId, token, CartItemRequest(productId))
+//            cartAdapter.notifyDataSetChanged()
         }
 
         cartAdapter.deleteCart = {
@@ -102,60 +103,50 @@ class CartFragment : Fragment() {
     }
 
     private fun getCartItemList(userId: String, token: String) {
-        cartViewModel.getUserCart(userId, token)
-        cartViewModel._liveDataCart.observe(viewLifecycleOwner, Observer {
-            Log.d(TAG, "onViewCreated: $it")
-            if (it.itemsCart.isEmpty()) {
+        with(cartViewModel){
+            getUserCart(userId, token)
+            cartItems.observe(viewLifecycleOwner){
+                Log.d(TAG, "onViewCreated: $it")
+                if (it.itemsCart.isEmpty()) {
+                    progressDialog.stop()
+                    binding.layoutCartEmpty.visibility = View.VISIBLE
+                    binding.nestedScrollViewCart.visibility = View.GONE
+                    binding.layoutTotalCart.visibility = View.GONE
+                    binding.btnCheckoutDetail.visibility = View.GONE
+                } else {
+                    binding.layoutCartEmpty.visibility = View.GONE
+                    binding.nestedScrollViewCart.visibility = View.VISIBLE
+                    binding.layoutTotalCart.visibility = View.VISIBLE
+                    binding.btnCheckoutDetail.visibility = View.VISIBLE
+                    cartId = it._id
+                    cartItemList.clear()
+                    cartItemList.addAll(it.itemsCart)
+                    val formatPrice = it.totalAmount.toString().replace("\\D+".toRegex(), "")
+                        .toLong().toString().replace("\\B(?=(\\d{3})+(?!\\d))".toRegex(), ",")
+                    binding.txtSubtotalValue.text = "$formatPrice vnđ"
+                    cartAdapter.notifyDataSetChanged()
+                    progressDialog.stop()
+                }
+            }
+            errorMessage.observe(viewLifecycleOwner){
+                Log.d(TAG, "observeDataError: $it")
                 progressDialog.stop()
                 binding.layoutCartEmpty.visibility = View.VISIBLE
-                binding.nestedScrollViewCart.visibility = View.GONE
-                binding.layoutTotalCart.visibility = View.GONE
-                binding.btnCheckoutDetail.visibility = View.GONE
-            } else {
-                binding.layoutCartEmpty.visibility = View.GONE
-                binding.nestedScrollViewCart.visibility = View.VISIBLE
-                binding.layoutTotalCart.visibility = View.VISIBLE
-                binding.btnCheckoutDetail.visibility = View.VISIBLE
-                cartId = it._id
-                cartItemList.clear()
-                cartItemList.addAll(it.itemsCart)
-                val formatPrice = it.totalAmount.toString().replace("\\D+".toRegex(), "")
-                    .toLong().toString().replace("\\B(?=(\\d{3})+(?!\\d))".toRegex(), ",")
-                binding.txtSubtotalValue.text = "$formatPrice vnđ"
-                cartAdapter.notifyDataSetChanged()
-                progressDialog.stop()
+                Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
             }
-        })
-        cartViewModel.error.observe(viewLifecycleOwner, Observer {
-            progressDialog.stop()
-            binding.layoutCartEmpty.visibility = View.VISIBLE
-        })
+            loading.observe(viewLifecycleOwner){
+                progressDialog.stop()
+                if(it) progressDialog.start("Loading Cart...")
+            }
+        }
     }
 
     private fun incrementQuantity(id: String, token: String, cartItemRequest: CartItemRequest) {
-        cartViewModel.incrementQuantity(id, token, cartItemRequest)
-        cartViewModel._liveDataCartIncrement.observe(viewLifecycleOwner, Observer {
-            Log.d(TAG, "incrementQuantity: $it")
-            cartItemList.clear()
-            cartItemList.addAll(it.itemsCart)
-            val formatPrice = it.totalAmount.toString().replace("\\D+".toRegex(), "")
-                .toLong().toString().replace("\\B(?=(\\d{3})+(?!\\d))".toRegex(), ",")
-            binding.txtSubtotalValue.text = "$formatPrice vnđ"
-            cartAdapter.notifyDataSetChanged()
-        })
+
     }
 
     private fun decrementQuantity(id: String, token: String, cartItemRequest: CartItemRequest) {
-        cartViewModel.decrementQuantity(id, token, cartItemRequest)
-        cartViewModel._dataCartDecrement.observe(viewLifecycleOwner, Observer {
-            Log.d(TAG, "decrementQuantity: $it")
-            cartItemList.clear()
-            cartItemList.addAll(it.itemsCart)
-            val formatPrice = it.totalAmount.toString().replace("\\D+".toRegex(), "")
-                .toLong().toString().replace("\\B(?=(\\d{3})+(?!\\d))".toRegex(), ",")
-            binding.txtSubtotalValue.text = "$formatPrice vnđ"
-            cartAdapter.notifyDataSetChanged()
-        })
+
     }
 
     override fun onDestroyView() {

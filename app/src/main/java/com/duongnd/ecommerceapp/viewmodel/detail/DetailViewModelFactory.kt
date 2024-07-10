@@ -2,15 +2,18 @@ package com.duongnd.ecommerceapp.viewmodel.detail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.duongnd.ecommerceapp.data.repository.CartRepository
 import com.duongnd.ecommerceapp.data.repository.MyRepository
-import com.duongnd.ecommerceapp.viewmodel.home.HomeViewModel
+import com.duongnd.ecommerceapp.data.repository.ProductsRepository
 
-class DetailViewModelFactory(private val repository: MyRepository) : ViewModelProvider.Factory {
+class DetailViewModelFactory(
+    private val productsRepository: ProductsRepository
+) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(DetailViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return DetailViewModel(repository) as T
+            return DetailViewModel(productsRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

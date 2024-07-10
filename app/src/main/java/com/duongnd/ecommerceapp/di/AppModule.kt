@@ -1,6 +1,7 @@
 package com.duongnd.ecommerceapp.di
 
 import com.duongnd.ecommerceapp.data.api.ApiService
+import com.duongnd.ecommerceapp.data.api.EcommerceApiService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -14,9 +15,9 @@ import javax.inject.Singleton
 object AppModule {
     @Provides
     @Singleton
-    fun provideApi(): ApiService {
-        return Retrofit.Builder().baseUrl("https://fakestoreapi.com/")
+    fun provideApi(): EcommerceApiService {
+        return Retrofit.Builder().baseUrl("http://192.168.99.52:8080/")
             .addConverterFactory(GsonConverterFactory.create()).build()
-            .create(ApiService::class.java)
+            .create(EcommerceApiService::class.java)
     }
 }

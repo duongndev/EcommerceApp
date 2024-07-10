@@ -13,7 +13,6 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import com.duongnd.ecommerceapp.R
 import com.duongnd.ecommerceapp.adapter.HomeAdapter
 import com.duongnd.ecommerceapp.data.api.RetrofitClient
@@ -26,7 +25,9 @@ import com.duongnd.ecommerceapp.viewmodel.home.HomeViewModel
 import com.duongnd.ecommerceapp.viewmodel.home.HomeViewModelFactory
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
@@ -34,12 +35,8 @@ class HomeFragment : Fragment() {
     private lateinit var homeAdapter: HomeAdapter
     private var productList = ArrayList<DataProduct>()
     private var isImageHeartSelected = false
-    private var categoryId: ArrayList<String> = ArrayList()
 
-
-    private val homeViewModel: HomeViewModel by viewModels {
-        HomeViewModelFactory(HomeRepository(apiService = RetrofitClient.apiService))
-    }
+    private val viewModel: NewHomeViewModel by viewModels()
 
     private val TAG = "HomeFragment"
 
@@ -56,6 +53,7 @@ class HomeFragment : Fragment() {
         binding.recyclerViewProduct.adapter = homeAdapter
 
         return binding.root
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -68,6 +66,7 @@ class HomeFragment : Fragment() {
         firstChip.isChecked = true
 
         if (firstChip.isChecked) {
+            productList.clear()
             getAllProducts()
         } else {
             Toast.makeText(requireContext(), "Error", Toast.LENGTH_SHORT).show()
@@ -78,10 +77,12 @@ class HomeFragment : Fragment() {
                 val chip = group.findViewById<Chip>(id)
                 if (chip.id == firstChip.id) {
                     showLoading(true)
+                    productList.clear()
                     getAllProducts()
                 } else {
                     showLoading(true)
                     val name = chip.text.toString()
+                    productList.clear()
                     updateDataRecyclerViewByCategory(name)
                 }
             }
@@ -134,7 +135,9 @@ class HomeFragment : Fragment() {
                 FilterBottomSheetFragment::class.java.simpleName
             )
         }
+
     }
+
 
 
     private fun ChipGroup.addChip(context: Context, label: String) {
@@ -161,28 +164,48 @@ class HomeFragment : Fragment() {
 
     private fun getAllProducts() {
         Handler(Looper.getMainLooper()).postDelayed({
-            homeViewModel.getAllProducts()
-            homeViewModel._liveDataProducts.observe(viewLifecycleOwner, Observer {
-                Log.d(TAG, "onViewCreated: $it")
-                productList.clear()
-                productList.addAll(it)
-                homeAdapter.notifyDataSetChanged()
-                showLoading(false)
-            })
-        }, 2000)
+            with(viewModel){
+                loadProductsList()
+                productsList.observe(viewLifecycleOwner){
+                    Log.d(TAG, "observeData: $it")
+                    productList.clear()
+                    productList.addAll(it)
+                    homeAdapter.notifyDataSetChanged()
+                    showLoading(false)
+                }
+                errorMessage.observe(viewLifecycleOwner){
+                    Log.d(TAG, "observeDataError: $it")
+                    Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
+                }
+                loading.observe(viewLifecycleOwner){
+                    Log.d(TAG, "observeDataLoading: $it")
+                    showLoading(it)
+                }
+            }
+        }, 3000)
     }
 
 
     private fun updateDataRecyclerViewByCategory(name: String) {
         Handler(Looper.getMainLooper()).postDelayed({
-            homeViewModel.getProductByCategoryId(name)
-            homeViewModel._liveDataProducts.observe(viewLifecycleOwner, Observer {
-                Log.d(TAG, "onViewCreated: $it")
-                productList.clear()
-                productList.addAll(it)
-                homeAdapter.notifyDataSetChanged()
-                showLoading(false)
-            })
+            with(viewModel){
+                loadProductByCategoryName(name)
+                productsList.observe(viewLifecycleOwner){
+                    Log.d(TAG, "observeData: $it")
+                    productList.clear()
+                    productList.addAll(it)
+                    homeAdapter.notifyDataSetChanged()
+                    showLoading(false)
+                }
+                errorMessage.observe(viewLifecycleOwner){
+                    Log.d(TAG, "observeDataError: $it")
+                    Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
+                }
+                loading.observe(viewLifecycleOwner){
+                    Log.d(TAG, "observeDataLoading: $it")
+                    showLoading(it)
+                }
+            }
         }, 2000)
     }
 
@@ -198,12 +221,23 @@ class HomeFragment : Fragment() {
     }
 
     private fun getAllCategories() {
-        homeViewModel.getAllCategories()
-        homeViewModel._liveDataCategories.observe(viewLifecycleOwner, Observer {
-            it.forEach { category ->
-                binding.chipGroup.addChip(requireContext(), category.nameCate)
+        with(viewModel){
+            categoriesList.observe(viewLifecycleOwner){
+                Log.d(TAG, "observeData: $it")
+                it.forEach { category ->
+                    binding.chipGroup.addChip(requireContext(), category.nameCate)
+                }
             }
-        })
+
+            errorMessage.observe(viewLifecycleOwner){
+                Log.d(TAG, "observeDataError: $it")
+                Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
+            }
+            loading.observe(viewLifecycleOwner){
+                Log.d(TAG, "observeDataLoading: $it")
+                showLoading(it)
+            }
+        }
     }
 
 

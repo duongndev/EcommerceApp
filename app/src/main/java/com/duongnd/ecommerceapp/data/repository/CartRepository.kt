@@ -4,6 +4,7 @@ import com.duongnd.ecommerceapp.data.api.ApiResponse
 import com.duongnd.ecommerceapp.data.api.EcommerceApiService
 import com.duongnd.ecommerceapp.data.model.cart.Cart
 import com.duongnd.ecommerceapp.data.request.AddToCartRequest
+import com.duongnd.ecommerceapp.data.request.CartItemRequest
 import com.duongnd.ecommerceapp.utils.Resource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -22,11 +23,20 @@ class CartRepository @Inject constructor(
         }.flowOn(Dispatchers.IO)
     }
 
-    suspend fun addToCart(token: String, addToCartRequest: AddToCartRequest): Flow<Resource<Cart>> {
+    suspend fun incrementQuantityCart(id: String, token: String, cartItemRequest: CartItemRequest): Flow<Resource<Cart>> {
         return flow {
             emit(safeApiCallCart {
-                ecommerceApiService.addCart(token, addToCartRequest)
+                ecommerceApiService.incrementQuantityCart(id, token, cartItemRequest)
             })
         }.flowOn(Dispatchers.IO)
     }
+
+    suspend fun decrementQuantityCart(id: String, token: String, cartItemRequest: CartItemRequest): Flow<Resource<Cart>> {
+        return flow {
+            emit(safeApiCallCart {
+                ecommerceApiService.decrementQuantityCart(id, token, cartItemRequest)
+            })
+        }.flowOn(Dispatchers.IO)
+    }
+
 }

@@ -1,7 +1,11 @@
 package com.duongnd.ecommerceapp.data.api
 
+import com.duongnd.ecommerceapp.data.model.address.Address
 import com.duongnd.ecommerceapp.data.model.cart.Cart
 import com.duongnd.ecommerceapp.data.model.category.Category
+import com.duongnd.ecommerceapp.data.model.login.DataLogin
+import com.duongnd.ecommerceapp.data.model.order.DataOrder
+import com.duongnd.ecommerceapp.data.model.order.Order
 import com.duongnd.ecommerceapp.data.model.product.DataProduct
 import com.duongnd.ecommerceapp.data.model.product.Products
 import com.duongnd.ecommerceapp.utils.Resource
@@ -9,6 +13,24 @@ import retrofit2.Response
 import timber.log.Timber
 
 abstract class ApiResponse {
+
+    suspend fun safeApiCallLogin(
+        apiCall: suspend () -> Response<DataLogin>
+    ): Resource<DataLogin> {
+        try {
+            Timber.tag("ApiResponse").d("checking...")
+            val response = apiCall()
+            if (response.isSuccessful) {
+                val body = response.body()
+                body?.let {
+                    return Resource.Success(body)
+                }
+            }
+            return error("${response.code()} ${response.message()}")
+        } catch (e: Exception) {
+            return error(e.message ?: e.toString())
+        }
+    }
 
     suspend fun safeApiCallProducts(
         apiCall: suspend () -> Response<Products>
@@ -22,9 +44,9 @@ abstract class ApiResponse {
                     return Resource.Success(body)
                 }
             }
-            return errorProduct("${response.code()} ${response.message()}")
+            return error("${response.code()} ${response.message()}")
         } catch (e: Exception) {
-            return errorProduct(e.message ?: e.toString())
+            return error(e.message ?: e.toString())
         }
     }
 
@@ -40,9 +62,9 @@ abstract class ApiResponse {
                     return Resource.Success(body)
                 }
             }
-            return errorProductDetail("${response.code()} ${response.message()}")
+            return error("${response.code()} ${response.message()}")
         } catch (e: Exception) {
-            return errorProductDetail(e.message ?: e.toString())
+            return error(e.message ?: e.toString())
         }
     }
 
@@ -58,9 +80,9 @@ abstract class ApiResponse {
                     return Resource.Success(body)
                 }
             }
-            return errorCategory("${response.code()} ${response.message()}")
+            return error("${response.code()} ${response.message()}")
         } catch (e: Exception) {
-            return errorCategory(e.message ?: e.toString())
+            return error(e.message ?: e.toString())
         }
     }
 
@@ -76,22 +98,51 @@ abstract class ApiResponse {
                     return Resource.Success(body)
                 }
             }
-            return errorCart("${response.code()} ${response.message()}")
+            return error("${response.code()} ${response.message()}")
         } catch (e: Exception) {
-            return errorCart(e.message ?: e.toString())
+            return error(e.message ?: e.toString())
+        }
+    }
+
+    suspend fun safeApiCallOrder(
+        apiCall: suspend () -> Response<DataOrder>
+    ): Resource<DataOrder> {
+        try {
+            Timber.tag("ApiResponse").d("checking...")
+            val response = apiCall()
+            if (response.isSuccessful) {
+                val body = response.body()
+                body?.let {
+                    return Resource.Success(body)
+                }
+            }
+            return error("${response.code()} ${response.message()}")
+        } catch (e: Exception) {
+            return error(e.message ?: e.toString())
+        }
+    }
+
+    suspend fun safeApiCallAddress(
+        apiCall: suspend () -> Response<Address>
+    ): Resource<Address> {
+        try {
+            Timber.tag("ApiResponse").d("checking...")
+            val response = apiCall()
+            if (response.isSuccessful) {
+                val body = response.body()
+                body?.let {
+                    return Resource.Success(body)
+                }
+            }
+            return error("${response.code()} ${response.message()}")
+        } catch (e: Exception) {
+            return error(e.message ?: e.toString())
         }
     }
 
 
-    private fun errorProduct(errorMessage: String): Resource<Products> =
+
+    private fun <T> error(errorMessage: String): Resource<T> =
         Resource.Error("Api call failed $errorMessage")
 
-    private fun errorProductDetail(errorMessage: String): Resource<DataProduct> =
-        Resource.Error("Api call failed $errorMessage")
-
-    private fun errorCategory(errorMessage: String): Resource<Category> =
-        Resource.Error("Api call failed $errorMessage")
-
-    private fun errorCart(errorMessage: String): Resource<Cart> =
-        Resource.Error("Api call failed $errorMessage")
 }

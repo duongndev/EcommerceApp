@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.duongnd.ecommerceapp.adapter.OrderTabAdapter
 import com.duongnd.ecommerceapp.databinding.FragmentOrderBinding
 import com.google.android.material.tabs.TabLayoutMediator
 
@@ -23,13 +24,16 @@ class OrderFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-//        TabLayoutMediator(binding.tabLayoutOrder, binding.viewPagerOrder) { tab, position ->
-//            when (position) {
-//                0 -> tab.text = "My Account"
-//                1 -> tab.text = "Order History"
-//                2 -> tab.text = "Payment History"
-//            }
-//        }.attach()
+
+        val adapter = OrderTabAdapter(parentFragmentManager, viewLifecycleOwner.lifecycle)
+        binding.viewPagerOrder.adapter = adapter
+        TabLayoutMediator(binding.tabLayoutOrder, binding.viewPagerOrder) { tab, position ->
+            when (position) {
+                0 -> tab.text = "Order History"
+                1 -> tab.text = "Order Completed"
+            }
+
+        }.attach()
     }
 
 }

@@ -1,6 +1,5 @@
 package com.duongnd.ecommerceapp.ui.auth.login
 
-import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
@@ -10,16 +9,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import com.duongnd.ecommerceapp.R
-import com.duongnd.ecommerceapp.data.api.RetrofitClient
 import com.duongnd.ecommerceapp.data.model.login.LoginRequest
 import com.duongnd.ecommerceapp.data.repository.AuthRepository
 import com.duongnd.ecommerceapp.databinding.FragmentLoginBinding
+import com.duongnd.ecommerceapp.di.AppModule
 import com.duongnd.ecommerceapp.ui.MainActivity
 import com.duongnd.ecommerceapp.utils.CustomProgressDialog
 import com.duongnd.ecommerceapp.utils.SessionManager
@@ -33,7 +30,7 @@ class LoginFragment : Fragment() {
     private val sessionManager = SessionManager()
 
     private val loginViewModel: LoginViewModel by viewModels {
-        LoginViewModelFactory(AuthRepository(apiService = RetrofitClient.apiService))
+        LoginViewModelFactory(AuthRepository(ecommerceApiService = AppModule.provideApi()))
     }
     private val progressDialog by lazy { CustomProgressDialog(requireContext()) }
 
@@ -98,8 +95,8 @@ class LoginFragment : Fragment() {
                 binding.inputLayoutEmailLogin.error = null
                 binding.inputLayoutPasswordLogin.error = null
                 val loginRequest = LoginRequest(email, password)
+                progressDialog.start("Loading...")
                 Handler(Looper.getMainLooper()).postDelayed({
-                    progressDialog.start("Loading...")
                     getLogin(loginRequest)
                 }, 3000)
 
@@ -107,12 +104,12 @@ class LoginFragment : Fragment() {
         }
     }
 
-    private fun getLogin(login: LoginRequest) {
-        Handler(Looper.getMainLooper()).postDelayed({
-            loginViewModel.getLogin(login)
-            loginViewModel._liveDataLogin.observe(viewLifecycleOwner) {
-                Log.d(TAG, "getLogin: $it")
+    private fun getLogin(loginRequest: LoginRequest) {
+        with(loginViewModel){
+            loginUser(loginRequest)
+            dataLogin.observe(viewLifecycleOwner){
                 if (it.success) {
+                    progressDialog.stop()
                     Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
                 } else {
                     binding.edtEmailLogin.setText("")
@@ -123,26 +120,20 @@ class LoginFragment : Fragment() {
                     sessionManager.setUserId(it.userId)
                     startActivity(Intent(requireContext(), MainActivity::class.java))
                     requireActivity().finish()
+                    progressDialog.stop()
                 }
-                progressDialog.stop()
             }
-            loginViewModel.error.observe(viewLifecycleOwner, Observer {
+            loading.observe(viewLifecycleOwner){
                 progressDialog.stop()
-                Log.d(TAG, "error: $it")
-                if (it.equals("User not found")) {
-                    binding.inputLayoutEmailLogin.error = it
-                } else if (it.equals("Password is incorrect")) {
-                    binding.inputLayoutPasswordLogin.error = it
-                } else {
-                    binding.inputLayoutEmailLogin.error = null
-                    binding.inputLayoutPasswordLogin.error = null
-                }
-            })
-        }, 3000)
+                if(it) progressDialog.start("Loading...")
+            }
+            errorMessage.observe(viewLifecycleOwner){
+                progressDialog.stop()
+                Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+                Log.e(TAG, "getLogin: $it")
+            }
 
-
-
-
+        }
     }
 
 }

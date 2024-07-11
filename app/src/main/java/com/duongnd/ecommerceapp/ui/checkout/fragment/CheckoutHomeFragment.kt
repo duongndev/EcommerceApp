@@ -17,9 +17,11 @@ import com.duongnd.ecommerceapp.R
 import com.duongnd.ecommerceapp.adapter.CheckoutAdapter
 import com.duongnd.ecommerceapp.data.api.RetrofitClient
 import com.duongnd.ecommerceapp.data.model.cart.ItemCart
+import com.duongnd.ecommerceapp.data.repository.CheckoutRepository
 import com.duongnd.ecommerceapp.data.repository.MyRepository
 import com.duongnd.ecommerceapp.data.request.OrderItemRequest
 import com.duongnd.ecommerceapp.databinding.FragmentCheckoutHomeBinding
+import com.duongnd.ecommerceapp.di.AppModule
 import com.duongnd.ecommerceapp.utils.CustomProgressDialog
 import com.duongnd.ecommerceapp.utils.SessionManager
 import com.duongnd.ecommerceapp.viewmodel.checkout.CheckoutViewModel
@@ -35,7 +37,7 @@ class CheckoutHomeFragment : Fragment() {
     private val sessionManager = SessionManager()
 
     private val checkoutViewModel: CheckoutViewModel by viewModels {
-        CheckoutViewModelFactory(MyRepository(apiService = RetrofitClient.apiService))
+        CheckoutViewModelFactory(CheckoutRepository(ecommerceApiService = AppModule.provideApi()))
     }
     private val progressDialog by lazy { CustomProgressDialog(requireContext()) }
 
@@ -81,6 +83,7 @@ class CheckoutHomeFragment : Fragment() {
         val userId = sessionManager.getUserId()!!
 
         layoutPayment()
+        progressDialog.start("Loading Address...")
         getAddress(token, userId)
 
         binding.listViewItemsCheckoutPayment.setOnItemClickListener { _, _, position, _ ->
@@ -109,26 +112,57 @@ class CheckoutHomeFragment : Fragment() {
 
         binding.bttPlaceOrder.setOnClickListener {
             progressDialog.start("Placing Order...")
-//            Toast.makeText(requireContext(), paymentMethod, Toast.LENGTH_SHORT).show()
-            checkoutViewModel.createOrder(token, OrderItemRequest(userId, paymentMethod))
-            checkoutViewModel._liveDataOrder.observe(viewLifecycleOwner, Observer {
-                Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
-                progressDialog.stop()
-            })
+            val addressLine = binding.txtDeliveryAddress.text.toString()
+            val phoneNumber = binding.txtDeliveryAddressPhone.text.toString()
+            addOrder(token, OrderItemRequest(userId, paymentMethod, addressLine, phoneNumber))
         }
 
     }
 
     private fun getAddress(token: String, userId: String) {
-        checkoutViewModel.getAllAddresses(token, userId)
-        checkoutViewModel._liveDataAddressItem.observe(viewLifecycleOwner, Observer {
-            Log.d(TAG, "onViewCreated: $it")
-            it.forEach { address ->
-                binding.txtTitleHomeDeliveryAddress.text = address.title
-                binding.txtDeliveryAddress.text = address.addressLine
-                binding.txtDeliveryAddressPhone.text = address.phoneNumber
+        with(checkoutViewModel){
+            getALlAddresses(token, userId)
+            addressItem.observe(viewLifecycleOwner){
+                Log.d(TAG, "onViewCreated: $it")
+                if (it.isEmpty()){
+                    progressDialog.stop()
+                    Toast.makeText(requireContext(), "No address found", Toast.LENGTH_SHORT).show()
+                } else {
+                    progressDialog.stop()
+                    it.forEach { address ->
+                        binding.txtTitleHomeDeliveryAddress.text = address.title
+                        binding.txtDeliveryAddress.text = address.addressLine
+                        binding.txtDeliveryAddressPhone.text = address.phoneNumber
+                    }
+                }
             }
-        })
+            errorMessage.observe(viewLifecycleOwner) {
+                progressDialog.stop()
+                Log.d(TAG, "observeIncrementQuantityError: $it")
+                Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
+            }
+            loading.observe(viewLifecycleOwner) {
+                if (it) progressDialog.start("Loading...")
+            }
+        }
+    }
+
+    private fun addOrder(token: String, orderItemRequest: OrderItemRequest) {
+        with(checkoutViewModel){
+            getOrder(token, orderItemRequest)
+            orderItem.observe(viewLifecycleOwner){
+                progressDialog.stop()
+                Toast.makeText(requireContext(), "Order Success", Toast.LENGTH_SHORT).show()
+            }
+            errorMessage.observe(viewLifecycleOwner) {
+                progressDialog.stop()
+                Log.d(TAG, "observeIncrementQuantityError: $it")
+                Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
+            }
+            loading.observe(viewLifecycleOwner) {
+                if (it) progressDialog.start("Placing Order...")
+            }
+        }
     }
 
     private fun layoutPayment() {

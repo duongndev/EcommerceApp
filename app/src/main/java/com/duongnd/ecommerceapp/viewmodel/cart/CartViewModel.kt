@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duongnd.ecommerceapp.data.model.cart.Cart
 import com.duongnd.ecommerceapp.data.repository.CartRepository
+import com.duongnd.ecommerceapp.data.request.CartItemRequest
 import com.duongnd.ecommerceapp.utils.MultipleLiveEvent
 import com.duongnd.ecommerceapp.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,7 +25,6 @@ class CartViewModel @Inject constructor(
     val loading: LiveData<Boolean> = _loading
     private val _errorMessage: MutableLiveData<String> = MutableLiveData()
     val errorMessage: LiveData<String> = _errorMessage
-
 
 
     fun getUserCart(id: String, token: String) = viewModelScope.launch {
@@ -50,4 +50,56 @@ class CartViewModel @Inject constructor(
             }
         }
     }
+
+    fun incrementQuantityCart(id: String, token: String, cartItemRequest: CartItemRequest) =
+        viewModelScope.launch {
+            cartRepository.incrementQuantityCart(id, "Bearer $token", cartItemRequest)
+                .collect { response ->
+                    run {
+                        when (response) {
+                            is Resource.Success -> {
+                                _loading.value = false
+                                val data = response.data!!
+                                _cartItems.postValue(data)
+                                Timber.d("loadProductsList: $data")
+                            }
+
+                            is Resource.Error -> {
+                                _loading.value = false
+                                _errorMessage.postValue(response.message!!)
+                            }
+
+                            is Resource.Loading -> {
+                                _loading.value = true
+                            }
+                        }
+                    }
+                }
+        }
+
+    fun decrementQuantityCart(id: String, token: String, cartItemRequest: CartItemRequest) =
+        viewModelScope.launch {
+            cartRepository.decrementQuantityCart(id, "Bearer $token", cartItemRequest)
+                .collect { response ->
+                    run {
+                        when (response) {
+                            is Resource.Success -> {
+                                _loading.value = false
+                                val data = response.data!!
+                                _cartItems.postValue(data)
+                                Timber.d("loadProductsList: $data")
+                            }
+
+                            is Resource.Error -> {
+                                _loading.value = false
+                                _errorMessage.postValue(response.message!!)
+                            }
+
+                            is Resource.Loading -> {
+                                _loading.value = true
+                            }
+                        }
+                    }
+                }
+        }
 }

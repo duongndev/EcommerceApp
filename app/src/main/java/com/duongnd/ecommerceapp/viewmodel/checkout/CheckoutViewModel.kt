@@ -1,56 +1,84 @@
 package com.duongnd.ecommerceapp.viewmodel.checkout
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.duongnd.ecommerceapp.data.model.address.AddressItem
-import com.duongnd.ecommerceapp.data.model.order.Order
-import com.duongnd.ecommerceapp.data.repository.MyRepository
+import androidx.lifecycle.viewModelScope
+import com.duongnd.ecommerceapp.data.model.address.Address
+import com.duongnd.ecommerceapp.data.model.order.DataOrder
+import com.duongnd.ecommerceapp.data.repository.CheckoutRepository
 import com.duongnd.ecommerceapp.data.request.OrderItemRequest
 import com.duongnd.ecommerceapp.utils.MultipleLiveEvent
-import com.duongnd.ecommerceapp.utils.SingleLiveEvent
+import com.duongnd.ecommerceapp.utils.Resource
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
+import timber.log.Timber
+import javax.inject.Inject
 
-class CheckoutViewModel(private val repository: MyRepository) : ViewModel() {
-
-    val _dataAddressItem = SingleLiveEvent<ArrayList<AddressItem>>()
-    val _liveDataAddressItem: LiveData<ArrayList<AddressItem>>
-        get() = _dataAddressItem
-
-    val _dataOrder = MultipleLiveEvent<Order>()
-    val _liveDataOrder: LiveData<Order>
-        get() = _dataOrder
-
-    private val _error = SingleLiveEvent<String>()
-    val error: LiveData<String>
-        get() = _error
+@HiltViewModel
+class CheckoutViewModel @Inject constructor(
+    private val checkoutRepository: CheckoutRepository
+) : ViewModel() {
 
 
-    fun getAllAddresses(token: String, id: String) {
-        repository.getAllAddresses(
-            "Bearer $token",
-            id,
-            object : MyRepository.onDataAddressItemListener {
-                override fun onDataSuccess(dataProduct: ArrayList<AddressItem>) {
-                    _dataAddressItem.value = dataProduct
+    private val _orderItem: MultipleLiveEvent<DataOrder> = MultipleLiveEvent()
+    val orderItem: LiveData<DataOrder> = _orderItem
+
+    private val _addressItem: MultipleLiveEvent<Address> = MultipleLiveEvent()
+    val addressItem: LiveData<Address> = _addressItem
+
+    private val _loading: MutableLiveData<Boolean> = MutableLiveData()
+    val loading: LiveData<Boolean> = _loading
+    private val _errorMessage: MutableLiveData<String> = MutableLiveData()
+    val errorMessage: LiveData<String> = _errorMessage
+
+
+    fun getOrder(token: String, orderItemRequest: OrderItemRequest) = viewModelScope.launch {
+        checkoutRepository.createOrder("Bearer $token", orderItemRequest).collect { response ->
+            run {
+                when (response) {
+                    is Resource.Success -> {
+                        _loading.value = false
+                        val data = response.data!!
+                        _orderItem.postValue(data)
+                        Timber.d("loadProductsList: $data")
+                    }
+
+                    is Resource.Error -> {
+                        _loading.value = false
+                        _errorMessage.postValue(response.message!!)
+                    }
+
+                    is Resource.Loading -> {
+                        _loading.value = true
+                    }
                 }
-
-                override fun onFail(error: String) {
-                    _error.value = error
-                }
-            })
+            }
+        }
     }
 
-    fun createOrder(token: String, orderItemRequest: OrderItemRequest) {
-        repository.createOrder(
-             "Bearer $token",
-            orderItemRequest,
-            object : MyRepository.onDataOrderItemListener {
-                override fun onDataSuccess(order: Order) {
-                    _dataOrder.value = order
-                }
+    fun getALlAddresses(token: String, id: String) = viewModelScope.launch {
+        checkoutRepository.getUserAddress("Bearer $token", id).collect { response ->
+            run {
+                when (response) {
+                    is Resource.Success -> {
+                        _loading.value = false
+                        val data = response.data!!
+                        _addressItem.postValue(data)
+                        Timber.d("loadAddresses: $data")
+                    }
 
-                override fun onDataFail(error: String) {
-                    _error.value = error
+                    is Resource.Error -> {
+                        _loading.value = false
+                        _errorMessage.postValue(response.message!!)
+                    }
+
+                    is Resource.Loading -> {
+                        _loading.value = true
+                    }
                 }
-            })
+            }
+        }
     }
+
 }

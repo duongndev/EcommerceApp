@@ -6,6 +6,7 @@ import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -13,10 +14,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.duongnd.ecommerceapp.adapter.AddressAdapter
 import com.duongnd.ecommerceapp.data.api.RetrofitClient
 import com.duongnd.ecommerceapp.data.model.address.AddressItem
+import com.duongnd.ecommerceapp.data.repository.AddressRepository
 import com.duongnd.ecommerceapp.data.repository.MyRepository
 import com.duongnd.ecommerceapp.databinding.FragmentAddressBinding
+import com.duongnd.ecommerceapp.di.AppModule
 import com.duongnd.ecommerceapp.utils.CustomProgressDialog
 import com.duongnd.ecommerceapp.utils.SessionManager
+import com.duongnd.ecommerceapp.viewmodel.address.AddressViewModel
+import com.duongnd.ecommerceapp.viewmodel.address.AddressViewModelFactory
 import com.duongnd.ecommerceapp.viewmodel.checkout.CheckoutViewModel
 import com.duongnd.ecommerceapp.viewmodel.checkout.CheckoutViewModelFactory
 
@@ -27,9 +32,10 @@ class AddressFragment : Fragment() {
     private lateinit var addressAdapter: AddressAdapter
     private val sessionManager = SessionManager()
 
-    private val checkoutViewModel: CheckoutViewModel by viewModels {
-        CheckoutViewModelFactory(MyRepository(apiService = RetrofitClient.apiService))
+    private val addressViewModel: AddressViewModel by viewModels {
+        AddressViewModelFactory(AddressRepository(ecommerceApiService = AppModule.provideApi()))
     }
+
     private val progressDialog by lazy { CustomProgressDialog(requireContext()) }
 
     override fun onCreateView(
@@ -61,24 +67,31 @@ class AddressFragment : Fragment() {
         }, 3000)
 
         binding.bttApplyAddress.setOnClickListener {
-
-//            val addressSelected = addressAdapter.getSelectedItem()
-//            if (addressSelected!= null) {
-//                Toast.makeText(requireContext(), addressSelected.addressLine, Toast.LENGTH_SHORT).show()
-//            } else {
-//                Toast.makeText(requireContext(), "Please select address", Toast.LENGTH_SHORT).show()
-//            }
+            val addressSelected = addressAdapter.getSelectedItem()
+            if (addressSelected!= null) {
+                Toast.makeText(requireContext(), addressSelected.addressLine, Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(requireContext(), "Please select address", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
     private fun getAllAddresses(token: String, userId: String) {
-        checkoutViewModel.getAllAddresses(token, userId)
-        checkoutViewModel._liveDataAddressItem.observe(viewLifecycleOwner, Observer {
-            addressItemList.clear()
-            addressItemList.addAll(it)
-            addressAdapter.notifyDataSetChanged()
-            progressDialog.stop()
-        })
+      with(addressViewModel){
+          getAllAddresses(token, userId)
+          allAddressItem.observe(viewLifecycleOwner){
+              progressDialog.stop()
+              if (it.isEmpty()){
+                  addressItemList.clear()
+                  addressAdapter.notifyDataSetChanged()
+                  Toast.makeText(requireContext(), "No address found", Toast.LENGTH_SHORT).show()
+              } else {
+                  addressItemList.clear()
+                  addressItemList.addAll(it)
+                  addressAdapter.notifyDataSetChanged()
+              }
+          }
+      }
     }
 
 }

@@ -5,9 +5,9 @@ import com.duongnd.ecommerceapp.data.model.cart.Cart
 import com.duongnd.ecommerceapp.data.model.category.Category
 import com.duongnd.ecommerceapp.data.model.login.DataLogin
 import com.duongnd.ecommerceapp.data.model.login.LoginRequest
+import com.duongnd.ecommerceapp.data.model.order.DataOrder
 import com.duongnd.ecommerceapp.data.model.order.Order
 import com.duongnd.ecommerceapp.data.model.product.DataProduct
-import com.duongnd.ecommerceapp.data.model.product.ProductDetail
 import com.duongnd.ecommerceapp.data.model.product.Products
 import com.duongnd.ecommerceapp.data.model.user.User
 import com.duongnd.ecommerceapp.data.request.AddToCartRequest
@@ -67,7 +67,9 @@ interface EcommerceApiService {
 
     // login
     @POST("/auth/login")
-    suspend fun loginUser(loginRequest: LoginRequest): Response<DataLogin>
+    suspend fun loginUser(
+        @Body loginRequest: LoginRequest
+    ): Response<DataLogin>
 
 
     // user
@@ -81,6 +83,7 @@ interface EcommerceApiService {
     suspend fun getAllCategories(): Response<Category>
 
     // address
+    @GET("/addresses/user/{id}")
     suspend fun getAllAddresses(
         @Header("Authorization") token: String,
         @Path("id") id: String
@@ -91,7 +94,7 @@ interface EcommerceApiService {
     suspend fun addOrder(
         @Header("Authorization") token: String,
         @Body orderItemRequest: OrderItemRequest
-    ): Response<Order>
+    ): Response<DataOrder>
 
 
 }

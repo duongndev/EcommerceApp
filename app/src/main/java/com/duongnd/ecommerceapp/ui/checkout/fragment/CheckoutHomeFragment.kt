@@ -12,13 +12,12 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import com.duongnd.ecommerceapp.R
 import com.duongnd.ecommerceapp.adapter.CheckoutAdapter
-import com.duongnd.ecommerceapp.data.api.RetrofitClient
 import com.duongnd.ecommerceapp.data.model.cart.ItemCart
+import com.duongnd.ecommerceapp.data.model.order.Order
+import com.duongnd.ecommerceapp.data.model.order.OrderItem
 import com.duongnd.ecommerceapp.data.repository.CheckoutRepository
-import com.duongnd.ecommerceapp.data.repository.MyRepository
 import com.duongnd.ecommerceapp.data.request.OrderItemRequest
 import com.duongnd.ecommerceapp.databinding.FragmentCheckoutHomeBinding
 import com.duongnd.ecommerceapp.di.AppModule
@@ -28,6 +27,13 @@ import com.duongnd.ecommerceapp.viewmodel.checkout.CheckoutViewModel
 import com.duongnd.ecommerceapp.viewmodel.checkout.CheckoutViewModelFactory
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
+import com.google.gson.Gson
+import io.socket.client.IO
+import io.socket.client.Socket
+import io.socket.emitter.Emitter
+import kotlinx.coroutines.runBlocking
+import org.json.JSONObject
+import java.net.URISyntaxException
 
 class CheckoutHomeFragment : Fragment() {
 
@@ -43,6 +49,17 @@ class CheckoutHomeFragment : Fragment() {
 
     val TAG = "CheckoutHomeFragment"
     private var paymentMethod = ""
+
+    private lateinit var mSocket: Socket
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        try {
+            mSocket = IO.socket("http://192.168.99.52:8080/")
+        } catch (e: URISyntaxException) {
+            e.printStackTrace()
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -73,6 +90,9 @@ class CheckoutHomeFragment : Fragment() {
 
         sessionManager.SessionManager(requireContext())
 
+        mSocket.on(Socket.EVENT_CONNECT, onConnect)
+        mSocket.on("newOrder", newOrder)
+        mSocket.connect()
         return binding.root
     }
 
@@ -120,11 +140,11 @@ class CheckoutHomeFragment : Fragment() {
     }
 
     private fun getAddress(token: String, userId: String) {
-        with(checkoutViewModel){
+        with(checkoutViewModel) {
             getALlAddresses(token, userId)
-            addressItem.observe(viewLifecycleOwner){
+            addressItem.observe(viewLifecycleOwner) {
                 Log.d(TAG, "onViewCreated: $it")
-                if (it.isEmpty()){
+                if (it.isEmpty()) {
                     progressDialog.stop()
                     Toast.makeText(requireContext(), "No address found", Toast.LENGTH_SHORT).show()
                 } else {
@@ -148,9 +168,10 @@ class CheckoutHomeFragment : Fragment() {
     }
 
     private fun addOrder(token: String, orderItemRequest: OrderItemRequest) {
-        with(checkoutViewModel){
+        with(checkoutViewModel) {
             getOrder(token, orderItemRequest)
-            orderItem.observe(viewLifecycleOwner){
+
+            orderItem.observe(viewLifecycleOwner) {
                 progressDialog.stop()
                 Toast.makeText(requireContext(), "Order Success", Toast.LENGTH_SHORT).show()
             }
@@ -247,6 +268,26 @@ class CheckoutHomeFragment : Fragment() {
             }
         }
 
+    }
+
+    private val onConnect = Emitter.Listener {
+        Log.d(TAG, "onConnect: $it")
+    }
+
+    private val newOrder = Emitter.Listener {
+        Log.d(TAG, "newOrder: $it")
+        val data = it[0] as JSONObject
+        val token = data.getString("token")
+        val order = data.getString("order")
+        val orderItemRequest = Gson().fromJson(order, OrderItemRequest::class.java)
+        addOrder(token, orderItemRequest)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mSocket.disconnect()
+        mSocket.off("newOrder", newOrder)
+        mSocket.off(Socket.EVENT_CONNECT, onConnect)
     }
 
 }

@@ -64,7 +64,6 @@ class CartFragment : Fragment() {
         val token = sessionManager.getToken()!!
 
         progressDialog.start("Loading Cart...")
-
         Handler(Looper.getMainLooper()).postDelayed({
             getCartItemList(userId, token)
         }, 2000)

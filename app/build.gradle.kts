@@ -97,4 +97,10 @@ dependencies {
     kapt ("androidx.hilt:hilt-compiler:1.2.0")
 
     implementation("com.jakewharton.timber:timber:5.0.1")
+
+    // Socket.io
+    implementation ("io.socket:socket.io-client:2.0.0") {
+        // excluding org.json which is provided by Android
+        exclude(group = "org.json", module = "json")
+    }
 }

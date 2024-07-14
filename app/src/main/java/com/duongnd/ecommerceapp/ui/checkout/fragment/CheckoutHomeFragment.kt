@@ -23,6 +23,7 @@ import com.duongnd.ecommerceapp.databinding.FragmentCheckoutHomeBinding
 import com.duongnd.ecommerceapp.di.AppModule
 import com.duongnd.ecommerceapp.utils.CustomProgressDialog
 import com.duongnd.ecommerceapp.utils.SessionManager
+import com.duongnd.ecommerceapp.utils.SocketManager
 import com.duongnd.ecommerceapp.viewmodel.checkout.CheckoutViewModel
 import com.duongnd.ecommerceapp.viewmodel.checkout.CheckoutViewModelFactory
 import com.google.android.material.chip.Chip
@@ -33,6 +34,7 @@ import io.socket.client.Socket
 import io.socket.emitter.Emitter
 import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
+import timber.log.Timber
 import java.net.URISyntaxException
 
 class CheckoutHomeFragment : Fragment() {
@@ -173,7 +175,8 @@ class CheckoutHomeFragment : Fragment() {
 
             orderItem.observe(viewLifecycleOwner) {
                 progressDialog.stop()
-                Toast.makeText(requireContext(), "Order Success", Toast.LENGTH_SHORT).show()
+                mSocket.emit("newOrder", it)
+                // emit notification
             }
             errorMessage.observe(viewLifecycleOwner) {
                 progressDialog.stop()
@@ -211,10 +214,10 @@ class CheckoutHomeFragment : Fragment() {
                 if (chip.id == firstChip.id) {
                     binding.listViewItemsCheckoutPayment.visibility = View.VISIBLE
                     paymentMethod = chip.text.toString()
-                    Toast.makeText(requireContext(), chip.text, Toast.LENGTH_SHORT).show()
+//                    Toast.makeText(requireContext(), chip.text, Toast.LENGTH_SHORT).show()
                 } else {
                     binding.listViewItemsCheckoutPayment.visibility = View.GONE
-                    Toast.makeText(requireContext(), chip.text, Toast.LENGTH_SHORT).show()
+//                    Toast.makeText(requireContext(), chip.text, Toast.LENGTH_SHORT).show()
                     paymentMethod = chip.text.toString()
                 }
             }
@@ -271,16 +274,13 @@ class CheckoutHomeFragment : Fragment() {
     }
 
     private val onConnect = Emitter.Listener {
-        Log.d(TAG, "onConnect: $it")
+        Timber.d("onConnect: $it")
     }
 
     private val newOrder = Emitter.Listener {
-        Log.d(TAG, "newOrder: $it")
         val data = it[0] as JSONObject
-        val token = data.getString("token")
-        val order = data.getString("order")
-        val orderItemRequest = Gson().fromJson(order, OrderItemRequest::class.java)
-        addOrder(token, orderItemRequest)
+        val orderId = data.getString("orderId")
+        Log.d(TAG, "newOrder: $orderId")
     }
 
     override fun onDestroy() {

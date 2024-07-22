@@ -64,6 +64,7 @@ dependencies {
     implementation ("com.github.denzcoskun:ImageSlideshow:0.1.2")
     implementation ("com.github.erkutaras:StateLayout:1.5.0")
     implementation ("com.facebook.shimmer:shimmer:0.5.0")
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
 
     // navigation
     implementation ("androidx.navigation:navigation-fragment-ktx:2.7.7")

@@ -279,8 +279,7 @@ class CheckoutHomeFragment : Fragment() {
 
     private val newOrder = Emitter.Listener {
         val data = it[0] as JSONObject
-        val orderId = data.getString("orderId")
-        Log.d(TAG, "newOrder: $orderId")
+        Log.d(TAG, "newOrder: $data")
     }
 
     override fun onDestroy() {

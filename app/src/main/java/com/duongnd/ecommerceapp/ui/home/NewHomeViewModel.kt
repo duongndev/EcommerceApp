@@ -19,12 +19,12 @@ class NewHomeViewModel @Inject constructor(
     private val productsRepository: ProductsRepository,
     private val categoryRepository: CategoryRepository
 ) : ViewModel() {
-    private val _productsList: MutableLiveData<ArrayList<DataProduct>> = MutableLiveData()
-    val productsList: LiveData<ArrayList<DataProduct>> = _productsList
+    private val _productsList: MutableLiveData<List<DataProduct>> = MutableLiveData()
+    val productsList: LiveData<List<DataProduct>> = _productsList
 
 
-    private val _categoriesList: MutableLiveData<ArrayList<DataCategory>> = MutableLiveData()
-    val categoriesList: LiveData<ArrayList<DataCategory>> = _categoriesList
+    private val _categoriesList: MutableLiveData<List<DataCategory>> = MutableLiveData()
+    val categoriesList: LiveData<List<DataCategory>> = _categoriesList
 
 
     private val _loading: MutableLiveData<Boolean> = MutableLiveData()
@@ -37,13 +37,13 @@ class NewHomeViewModel @Inject constructor(
         loadCategoryList()
     }
 
-     fun loadProductsList() = viewModelScope.launch {
+    fun loadProductsList() = viewModelScope.launch {
         productsRepository.getAllProducts().collect { response ->
             run {
                 when (response) {
                     is Resource.Success -> {
                         _loading.value = false
-                        val data = response.data!!
+                        val data = response.data!!.products
                         _productsList.postValue(data)
                         Timber.d("loadProductsList: $data")
                     }
@@ -60,6 +60,7 @@ class NewHomeViewModel @Inject constructor(
             }
         }
     }
+
     private fun loadCategoryList() = viewModelScope.launch {
         categoryRepository.getAllCategory().collect { response ->
             run {
@@ -90,7 +91,7 @@ class NewHomeViewModel @Inject constructor(
                 when (response) {
                     is Resource.Success -> {
                         _loading.value = false
-                        val data = response.data!!
+                        val data = response.data!!.products
                         _productsList.postValue(data)
                         Timber.d("loadProductByCategoryName: $data")
                     }
@@ -107,8 +108,6 @@ class NewHomeViewModel @Inject constructor(
             }
         }
     }
-
-
 
 
 }

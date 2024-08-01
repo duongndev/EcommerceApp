@@ -8,7 +8,7 @@ data class ItemCart(
     val _id: String,
     val image: String,
     val name: String,
-    val price: Int,
+    val price: Double,
     val productId: String,
     val quantity: Int
 ) : Parcelable

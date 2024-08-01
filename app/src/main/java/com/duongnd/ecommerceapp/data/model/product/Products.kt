@@ -1,3 +1,8 @@
 package com.duongnd.ecommerceapp.data.model.product
 
-class Products: ArrayList<DataProduct>()
+data class Products(
+    val currentPage: Int,
+    val totalItems: Int,
+    val totalPages: Int,
+    val products: List<DataProduct> = ArrayList() //
+)

@@ -112,9 +112,8 @@ class CartFragment : Fragment() {
                     cartId = it._id
                     cartItemList.clear()
                     cartItemList.addAll(it.itemsCart)
-                    val formatPrice = it.totalAmount.toString().replace("\\D+".toRegex(), "")
-                        .toLong().toString().replace("\\B(?=(\\d{3})+(?!\\d))".toRegex(), ",")
-                    binding.txtSubtotalValue.text = "$formatPrice vnđ"
+
+                    binding.txtSubtotalValue.text = it.totalAmount.toString()
                     cartAdapter.notifyDataSetChanged()
                     progressDialog.stop()
                 }

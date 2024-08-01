@@ -2,6 +2,7 @@ package com.duongnd.ecommerceapp.adapter
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.icu.text.NumberFormat
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
@@ -13,10 +14,9 @@ import com.duongnd.ecommerceapp.R
 import com.duongnd.ecommerceapp.data.model.product.DataProduct
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
-import java.lang.Exception
 import java.util.Locale
 
-class HomeAdapter(private val productList: ArrayList<DataProduct>, private val context: Context) :
+class HomeAdapter(private val productList: List<DataProduct>, private val context: Context) :
     RecyclerView.Adapter<HomeAdapter.HomeViewHolder>() {
 
 
@@ -41,11 +41,14 @@ class HomeAdapter(private val productList: ArrayList<DataProduct>, private val c
 
         holder.txtNameProduct.text = product.name_product
 
-        val local = Locale("vi", "VN")
 
         val formatPrice = product.price.toString().replace("\\D+".toRegex(), "")
             .toLong().toString().replace("\\B(?=(\\d{3})+(?!\\d))".toRegex(), ",")
-        holder.txtPriceProduct.text = "$formatPrice vnđ"
+
+        val locale = Locale("vi", "VN")
+        val numberFormat = NumberFormat.getInstance(locale)
+        val formattedPrice = numberFormat.format(product.price)
+        holder.txtPriceProduct.text = "$formattedPrice vnđ"
 
         val imgUrl = product.imageUrls
 
@@ -73,6 +76,6 @@ class HomeAdapter(private val productList: ArrayList<DataProduct>, private val c
     }
 
     var clickToSaved: ((itemView: View) -> Unit)? = null
-    var clickToDetail:((DataProduct) -> Unit)? = null
+    var clickToDetail: ((DataProduct) -> Unit)? = null
 
 }

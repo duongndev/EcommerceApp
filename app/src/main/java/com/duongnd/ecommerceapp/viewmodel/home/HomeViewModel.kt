@@ -9,8 +9,8 @@ import com.duongnd.ecommerceapp.utils.SingleLiveEvent
 
 class HomeViewModel(private val homeRepository: HomeRepository) : ViewModel() {
 
-    val _dataProducts = SingleLiveEvent<ArrayList<DataProduct>>()
-    val _liveDataProducts: LiveData<ArrayList<DataProduct>>
+    val _dataProducts = SingleLiveEvent<List<DataProduct>>()
+    val _liveDataProducts: LiveData<List<DataProduct>>
         get() = _dataProducts
 
     val _dataCategories = SingleLiveEvent<ArrayList<DataCategory>>()
@@ -23,7 +23,7 @@ class HomeViewModel(private val homeRepository: HomeRepository) : ViewModel() {
 
     fun getAllProducts() {
         homeRepository.getAllProducts(object : HomeRepository.onDataProductsListener {
-            override fun onDataSuccess(dataProducts: ArrayList<DataProduct>) {
+            override fun onDataSuccess(dataProducts: List<DataProduct>) {
                 _dataProducts.postValue(dataProducts)
             }
 
@@ -49,7 +49,7 @@ class HomeViewModel(private val homeRepository: HomeRepository) : ViewModel() {
 
     fun getProductByCategoryId(name: String){
         homeRepository.getProductByCategoryId(name, object: HomeRepository.onDataProductsListener {
-            override fun onDataSuccess(dataProducts: ArrayList<DataProduct>) {
+            override fun onDataSuccess(dataProducts: List<DataProduct>) {
                 _dataProducts.postValue(dataProducts)
             }
 

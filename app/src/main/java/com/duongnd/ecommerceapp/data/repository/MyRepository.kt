@@ -20,7 +20,8 @@ class MyRepository(private val apiService: ApiService) {
         apiService.getAllProducts().enqueue(object : Callback<Products> {
             override fun onResponse(call: Call<Products>, response: Response<Products>) {
                 if (response.isSuccessful) {
-                    onDataProductsListener.onDataSuccess(response.body()!!)
+                    val data = response.body()!!.products
+                    onDataProductsListener.onDataSuccess(data)
                 } else {
                     onDataProductsListener.onFail(response.errorBody().toString())
                 }
@@ -114,7 +115,7 @@ class MyRepository(private val apiService: ApiService) {
 
 
     interface onDataProductsListener {
-        fun onDataSuccess(products: ArrayList<DataProduct>)
+        fun onDataSuccess(products: List<DataProduct>)
         fun onFail(error: String)
     }
 

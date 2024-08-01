@@ -1,6 +1,5 @@
 package com.duongnd.ecommerceapp.data.repository
 
-import android.util.Log
 import com.duongnd.ecommerceapp.data.api.ApiService
 import com.duongnd.ecommerceapp.data.model.category.Category
 import com.duongnd.ecommerceapp.data.model.category.DataCategory
@@ -16,7 +15,8 @@ class HomeRepository(private val apiService: ApiService) {
         apiService.getAllProducts().enqueue(object : Callback<Products> {
             override fun onResponse(call: Call<Products>, response: Response<Products>) {
                 if (response.isSuccessful) {
-                    onDataProductsListener.onDataSuccess(response.body()!!)
+                    val data = response.body()!!.products
+                    onDataProductsListener.onDataSuccess(data)
                 } else {
                     onDataProductsListener.onDataFail(response.message())
                 }
@@ -51,7 +51,8 @@ class HomeRepository(private val apiService: ApiService) {
         apiService.getProductsByCategoryId(name).enqueue(object: Callback<Products> {
             override fun onResponse(call: Call<Products>, response: Response<Products>) {
                 if (response.isSuccessful) {
-                    onDataProductsListener.onDataSuccess(response.body()!!)
+                    val data = response.body()!!.products
+                    onDataProductsListener.onDataSuccess(data)
                 } else {
                     onDataProductsListener.onDataFail(response.errorBody().toString())
                 }
@@ -70,7 +71,7 @@ class HomeRepository(private val apiService: ApiService) {
     }
 
     interface onDataProductsListener {
-        fun onDataSuccess(dataProducts: ArrayList<DataProduct>)
+        fun onDataSuccess(dataProducts: List<DataProduct>)
         fun onDataFail(error: String)
     }
 

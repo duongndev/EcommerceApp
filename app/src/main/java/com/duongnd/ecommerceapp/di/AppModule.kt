@@ -2,6 +2,7 @@ package com.duongnd.ecommerceapp.di
 
 import com.duongnd.ecommerceapp.data.api.EcommerceApiService
 import com.duongnd.ecommerceapp.utils.Constants.Companion.BASE_URL1
+import com.duongnd.ecommerceapp.utils.Constants.Companion.BASE_URL2
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

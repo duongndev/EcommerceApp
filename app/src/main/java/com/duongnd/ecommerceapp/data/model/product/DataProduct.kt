@@ -8,7 +8,9 @@ data class DataProduct(
     val description: String,
     val imageUrls: List<ImageUrl>,
     val name_product: String,
-    val price: Int,
-    val reviews: List<Any>,
+    val price: Any,
+    val size: List<Any>,
+    val colors: List<Any>,
+    val reviews: List<Review>,
     val updatedAt: String
 )

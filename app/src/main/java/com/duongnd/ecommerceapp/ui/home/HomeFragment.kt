@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.RecyclerView
 import com.duongnd.ecommerceapp.R
 import com.duongnd.ecommerceapp.adapter.HomeAdapter
 import com.duongnd.ecommerceapp.data.model.product.DataProduct
@@ -58,6 +59,13 @@ class HomeFragment : Fragment() {
         getAllCategories()
         val firstChip: Chip = binding.chipGroup.getChildAt(0) as Chip
         firstChip.isChecked = true
+
+        binding.recyclerViewProduct.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+
+            }
+        })
 
         if (firstChip.isChecked) {
             productList.clear()
@@ -189,7 +197,6 @@ class HomeFragment : Fragment() {
             }
             errorMessage.observe(viewLifecycleOwner) {
                 Log.d(TAG, "observeDataError: $it")
-                Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
             }
             loading.observe(viewLifecycleOwner) {
                 Log.d(TAG, "observeDataLoading: $it")
@@ -220,7 +227,6 @@ class HomeFragment : Fragment() {
 
             errorMessage.observe(viewLifecycleOwner) {
                 Log.d(TAG, "observeDataError: $it")
-                Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
             }
             loading.observe(viewLifecycleOwner) {
                 Log.d(TAG, "observeDataLoading: $it")
@@ -239,6 +245,7 @@ class HomeFragment : Fragment() {
     override fun onDestroy() {
         super.onDestroy()
         Log.d(TAG, "onDestroy: destroy")
+        _binding = null
     }
 
     override fun onStop() {

@@ -1,6 +1,7 @@
 package com.duongnd.ecommerceapp.adapter
 
 import android.content.Context
+import android.icu.text.NumberFormat
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -8,12 +9,11 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.duongnd.ecommerceapp.R
-import com.duongnd.ecommerceapp.data.model.cart.Cart
 import com.duongnd.ecommerceapp.data.model.cart.ItemCart
-import com.duongnd.ecommerceapp.data.model.product.DataProduct
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
-import java.lang.Exception
+import java.util.Locale
+
 
 class CartAdapter(
     private val itemsCartList: MutableList<ItemCart>,
@@ -43,8 +43,14 @@ class CartAdapter(
 
         val formatPrice = itemCart.price.toString().replace("\\D+".toRegex(), "")
             .toLong().toString().replace("\\B(?=(\\d{3})+(?!\\d))".toRegex(), ",")
+
+        val locale = Locale("vi", "VN")
+        val numberFormat = NumberFormat.getInstance(locale)
+        val formattedPrice = numberFormat.format(itemCart.price)
+        holder.txtPriceProductCart.text = "$formattedPrice vnđ"
+
+
         holder.txtNameProductCart.text = itemCart.name
-        holder.txtPriceProductCart.text = "$formatPrice vnđ"
         holder.quantityProductCart.text = itemCart.quantity.toString()
         Picasso.get()
             .load(itemCart.image)

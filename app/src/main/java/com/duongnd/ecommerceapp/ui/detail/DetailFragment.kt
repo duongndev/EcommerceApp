@@ -21,20 +21,18 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.duongnd.ecommerceapp.R
-import com.duongnd.ecommerceapp.data.repository.CartRepository
+import com.duongnd.ecommerceapp.data.model.product.Review
 import com.duongnd.ecommerceapp.data.repository.ProductsRepository
 import com.duongnd.ecommerceapp.data.request.AddToCartRequest
 import com.duongnd.ecommerceapp.databinding.FragmentDetailBinding
 import com.duongnd.ecommerceapp.di.AppModule
 import com.duongnd.ecommerceapp.ui.MainActivity
 import com.duongnd.ecommerceapp.utils.CustomProgressDialog
-import com.duongnd.ecommerceapp.utils.FormatPriceToVietnamese
 import com.duongnd.ecommerceapp.utils.SessionManager
 import com.duongnd.ecommerceapp.viewmodel.detail.DetailViewModel
 import com.duongnd.ecommerceapp.viewmodel.detail.DetailViewModelFactory
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
-import com.squareup.picasso.Picasso
 import timber.log.Timber
 import java.util.Locale
 
@@ -45,7 +43,7 @@ class DetailFragment : Fragment() {
 
     private val sessionManager = SessionManager()
 
-    private val detailViewModel: DetailViewModel by viewModels{
+    private val detailViewModel: DetailViewModel by viewModels {
         DetailViewModelFactory(ProductsRepository(ecommerceApiService = AppModule.provideApi()))
     }
 
@@ -53,6 +51,8 @@ class DetailFragment : Fragment() {
 
     private var TAG = "DetailFragment"
     private var productId: String = ""
+    private var reviewsList = ArrayList<Review>()
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -96,6 +96,19 @@ class DetailFragment : Fragment() {
             progressDialog.start("Đang thêm sản phẩm vào giỏ hàng...")
             addProductToCart(token, AddToCartRequest(userId, productId, quantity))
         }
+
+        binding.txtRatingsProductDetail.setOnClickListener {
+            val bundleReview = Bundle()
+            // put list review to fragment review
+            bundleReview.putParcelableArrayList("reviews", reviewsList)
+            val reviewFragment = ReviewFragment()
+//            reviewFragment.arguments = bundle
+            requireActivity().supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container_view_main_activity, reviewFragment)
+                .addToBackStack(null)
+                .commit()
+        }
+
     }
 
     @SuppressLint("SetTextI18n")
@@ -113,35 +126,43 @@ class DetailFragment : Fragment() {
                     binding.txtPriceProductDetail.text = "$formattedPrice đ"
                     binding.txtDescriptionProductDetail.text = it.description
                     it.size.forEach { size ->
-                        binding.chipGroupSizeProductDetail.addChip(requireContext(), size.toString())
+                        binding.chipGroupSizeProductDetail.removeAllViews()
+                        binding.chipGroupSizeProductDetail.addChip(
+                            requireContext(),
+                            size.toString()
+                        )
                     }
+
+                    reviewsList.clear()
+                    reviewsList.addAll(it.reviews)
+
                     it.imageUrls.forEach { image ->
-                       Glide.with(requireContext())
-                           .load(image.secure_url)
-                           .listener(object : RequestListener<Drawable> {
-                               override fun onLoadFailed(
-                                   e: GlideException?,
-                                   model: Any?,
-                                   target: Target<Drawable>,
-                                   isFirstResource: Boolean
-                               ): Boolean {
-                                   binding.progressBarProductDetail.visibility = View.VISIBLE
-                                   return false
-                               }
+                        Glide.with(requireContext())
+                            .load(image.secure_url)
+                            .listener(object : RequestListener<Drawable> {
+                                override fun onLoadFailed(
+                                    e: GlideException?,
+                                    model: Any?,
+                                    target: Target<Drawable>,
+                                    isFirstResource: Boolean
+                                ): Boolean {
+                                    binding.progressBarProductDetail.visibility = View.VISIBLE
+                                    return false
+                                }
 
-                               override fun onResourceReady(
-                                   resource: Drawable,
-                                   model: Any,
-                                   target: Target<Drawable>?,
-                                   dataSource: DataSource,
-                                   isFirstResource: Boolean
-                               ): Boolean {
-                                   binding.progressBarProductDetail.visibility = View.GONE
-                                   return false
-                               }
+                                override fun onResourceReady(
+                                    resource: Drawable,
+                                    model: Any,
+                                    target: Target<Drawable>?,
+                                    dataSource: DataSource,
+                                    isFirstResource: Boolean
+                                ): Boolean {
+                                    binding.progressBarProductDetail.visibility = View.GONE
+                                    return false
+                                }
 
-                           })
-                           .into(binding.imgProductDetails)
+                            })
+                            .into(binding.imgProductDetails)
 
                     }
 

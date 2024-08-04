@@ -11,6 +11,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import com.duongnd.ecommerceapp.R
 import com.duongnd.ecommerceapp.utils.SessionManager
+import com.duongnd.ecommerceapp.utils.checkToken
 import com.duongnd.ecommerceapp.view.auth.AuthActivity
 import dagger.hilt.android.AndroidEntryPoint
 import org.json.JSONObject
@@ -37,7 +38,7 @@ class SplashActivity : AppCompatActivity() {
             val userId = sessionManager.getUserId()
             Log.d(TAG, "onCreate:  token: $token")
             Log.d(TAG, "onCreate:  userId: $userId")
-            val isValidToken = checkToken(token!!)
+            val isValidToken = checkToken(token!!, this)
             if (isValidToken) {
                 val intent = Intent(this, MainActivity::class.java)
                 startActivity(intent)
@@ -51,40 +52,5 @@ class SplashActivity : AppCompatActivity() {
         }, 3000)
     }
 
-
-    private fun checkToken(token: String): Boolean {
-        if (token.isBlank()) {
-            return false
-        }
-        try {
-            // Token JWT có 3 phần tách biệt bởi dấu chấm: header, payload, signature
-            val parts = token.split(".")
-            if (parts.size != 3) {
-                return false
-            }
-            // Phần payload chứa thông tin về ngày hết hạn (exp)
-            val payload = String(Base64.decode(parts[1], Base64.URL_SAFE))
-            val payloadJson = JSONObject(payload)
-
-            // Lấy giá trị của exp (thời gian hết hạn) từ payload
-            if (payloadJson.has("exp")) {
-                val exp = payloadJson.getLong("exp")
-                // So sánh thời gian hết hạn với thời gian hiện tại
-                val now = Date().time / 1000
-                return now < exp
-            }
-            // lấy giá trị của id (user id) trong payload
-            if (payloadJson.has("id")) {
-                val userId = payloadJson.getString("id")
-                Log.d(TAG, "checkToken - userId: $userId")
-                sessionManager.setUserId(userId)
-                return true
-            }
-            return false
-        } catch (e: Exception) {
-            e.printStackTrace()
-            return false
-        }
-    }
 
 }

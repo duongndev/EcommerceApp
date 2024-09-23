@@ -8,6 +8,7 @@ import com.duongnd.ecommerceapp.data.model.order.DataOrder
 import com.duongnd.ecommerceapp.data.model.order.Order
 import com.duongnd.ecommerceapp.data.model.product.DataProduct
 import com.duongnd.ecommerceapp.data.model.product.Products
+import com.duongnd.ecommerceapp.data.model.wishlist.Wishlist
 import com.duongnd.ecommerceapp.utils.Resource
 import retrofit2.Response
 import timber.log.Timber
@@ -125,6 +126,24 @@ abstract class ApiResponse {
     suspend fun safeApiCallAddress(
         apiCall: suspend () -> Response<Address>
     ): Resource<Address> {
+        try {
+            Timber.tag("ApiResponse").d("checking...")
+            val response = apiCall()
+            if (response.isSuccessful) {
+                val body = response.body()
+                body?.let {
+                    return Resource.Success(body)
+                }
+            }
+            return error("${response.code()} ${response.message()}")
+        } catch (e: Exception) {
+            return error(e.message ?: e.toString())
+        }
+    }
+
+    suspend fun safeApiCallWishlist(
+        apiCall: suspend () -> Response<Wishlist>
+    ): Resource<Wishlist> {
         try {
             Timber.tag("ApiResponse").d("checking...")
             val response = apiCall()

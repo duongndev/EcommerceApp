@@ -13,6 +13,9 @@ class OrderFragment : Fragment() {
 
     private var _binding: FragmentOrderBinding? = null
     private val binding get() = _binding!!
+
+    private lateinit var  orderTabAdapter: OrderTabAdapter
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -25,15 +28,12 @@ class OrderFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val adapter = OrderTabAdapter(parentFragmentManager, viewLifecycleOwner.lifecycle)
-        binding.viewPagerOrder.adapter = adapter
-        TabLayoutMediator(binding.tabLayoutOrder, binding.viewPagerOrder) { tab, position ->
-            when (position) {
-                0 -> tab.text = "Order History"
-                1 -> tab.text = "Order Completed"
-            }
+        orderTabAdapter = OrderTabAdapter(childFragmentManager, viewLifecycleOwner.lifecycle)
 
-        }.attach()
+        binding.viewPagerOrder.adapter = orderTabAdapter
+        binding.customTabBar.attachTo(binding.viewPagerOrder)
+
+
     }
 
 }

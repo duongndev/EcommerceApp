@@ -83,7 +83,6 @@ class CartFragment : Fragment() {
         }
 
         binding.btnCheckoutDetail.setOnClickListener {
-//            startActivity(Intent(requireActivity(), CheckoutActivity::class.java))
             val intent = Intent(requireActivity(), CheckoutActivity::class.java)
             intent.putParcelableArrayListExtra("itemsCart", cartItemList)
             intent.putExtra("totalAmount", binding.txtSubtotalValue.text.toString())
@@ -113,7 +112,9 @@ class CartFragment : Fragment() {
                     cartItemList.clear()
                     cartItemList.addAll(it.itemsCart)
 
-                    binding.txtSubtotalValue.text = it.totalAmount.toString()
+                    val formatedTotalAmount = String.format("%.2f", it.totalAmount)
+
+                    binding.txtSubtotalValue.text = "$formatedTotalAmount VND"
                     cartAdapter.notifyDataSetChanged()
                     progressDialog.stop()
                 }
@@ -122,7 +123,6 @@ class CartFragment : Fragment() {
                 Log.d(TAG, "observeDataError: $it")
                 progressDialog.stop()
                 binding.layoutCartEmpty.visibility = View.VISIBLE
-                Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
             }
             loading.observe(viewLifecycleOwner) {
                 progressDialog.stop()
@@ -150,7 +150,7 @@ class CartFragment : Fragment() {
                     cartItemList.clear()
                     cartItemList.addAll(it.itemsCart)
                     val formatPrice = it.totalAmount.toString().replace("\\D+".toRegex(), "")
-                        .toLong().toString().replace("\\B(?=(\\d{3})+(?!\\d))".toRegex(), ",")
+                        .toLong().toString().replace("\\B(?=(\\d{2})+(?!\\d))".toRegex(), ",")
                     binding.txtSubtotalValue.text = "$formatPrice vnđ"
                     cartAdapter.notifyDataSetChanged()
                 }
@@ -190,7 +190,6 @@ class CartFragment : Fragment() {
             }
             errorMessage.observe(viewLifecycleOwner) {
                 Log.d(TAG, "observeIncrementQuantityError: $it")
-                Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
             }
             loading.observe(viewLifecycleOwner) {
                 if (it) progressDialog.start("Loading...")

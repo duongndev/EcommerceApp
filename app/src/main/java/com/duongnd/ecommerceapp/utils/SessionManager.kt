@@ -10,6 +10,7 @@ class SessionManager {
     private val KEY_IS_LOGGED_IN = "is_logged_in"
     private val KEY_TOKEN = ""
     private val KEY_ADDRESS_ID = ""
+    private val KEY_SAVED_PRODUCTS = "produced_id"
 
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var editor: SharedPreferences.Editor
@@ -51,6 +52,26 @@ class SessionManager {
     }
     fun isLoggedIn(): Boolean {
         return sharedPreferences.getBoolean(KEY_IS_LOGGED_IN, false)
+    }
+
+
+    fun setSavedProducts(productId: String) {
+        editor.putString(KEY_SAVED_PRODUCTS, productId)
+        editor.apply()
+    }
+
+    fun clearSavedProducts() {
+        editor.putString(KEY_SAVED_PRODUCTS, "")
+        editor.apply()
+    }
+
+    fun getSavedProducts(): String? {
+        return sharedPreferences.getString(KEY_SAVED_PRODUCTS, "")
+    }
+
+    fun clearSession() {
+        editor.clear()
+        editor.apply()
     }
 
     fun logoutUser() {

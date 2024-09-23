@@ -18,6 +18,7 @@ import com.duongnd.ecommerceapp.data.model.product.DataProduct
 import com.duongnd.ecommerceapp.databinding.FragmentHomeBinding
 import com.duongnd.ecommerceapp.ui.bottomsheet.FilterBottomSheetFragment
 import com.duongnd.ecommerceapp.ui.detail.DetailFragment
+import com.duongnd.ecommerceapp.utils.SessionManager
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import dagger.hilt.android.AndroidEntryPoint
@@ -34,6 +35,7 @@ class HomeFragment : Fragment() {
     private val viewModel: NewHomeViewModel by viewModels()
 
     private val TAG = "HomeFragment"
+    private val sessionManager = SessionManager()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -90,18 +92,20 @@ class HomeFragment : Fragment() {
             }
         }
 
-        homeAdapter.clickToSaved = {
-            val imageButton = it as ImageButton
+        homeAdapter.clickToSaved = { click, product ->
+            val imageButton = click as ImageButton
             if (isImageHeartSelected) {
-                it.isSelected = false
+                click.isSelected = false
                 Toast.makeText(context, "Đã xóa khỏi mục yêu thích", Toast.LENGTH_SHORT)
                     .show()
                 imageButton.setImageResource(R.drawable.ic_heart)
             } else {
-                it.isSelected = true
+                click.isSelected = true
                 Toast.makeText(context, "Đã thêm vào mục yêu thích", Toast.LENGTH_SHORT)
                     .show()
                 imageButton.setImageResource(R.drawable.ic_heart_filled)
+                // print product name
+                Log.d(TAG, "onViewCreated: ${product.name_product}")
             }
 
             isImageHeartSelected = !isImageHeartSelected
@@ -171,6 +175,7 @@ class HomeFragment : Fragment() {
                 productList.clear()
                 productList.addAll(it)
                 homeAdapter.notifyDataSetChanged()
+
                 showLoading(false)
             }
             errorMessage.observe(viewLifecycleOwner) {

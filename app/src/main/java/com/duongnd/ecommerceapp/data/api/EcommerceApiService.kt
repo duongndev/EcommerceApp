@@ -10,9 +10,13 @@ import com.duongnd.ecommerceapp.data.model.order.Order
 import com.duongnd.ecommerceapp.data.model.product.DataProduct
 import com.duongnd.ecommerceapp.data.model.product.Products
 import com.duongnd.ecommerceapp.data.model.user.User
+import com.duongnd.ecommerceapp.data.model.wishlist.Wishlist
+import com.duongnd.ecommerceapp.data.model.wishlist.WishlistItem
 import com.duongnd.ecommerceapp.data.request.AddToCartRequest
+import com.duongnd.ecommerceapp.data.request.AddToWishlistRequest
 import com.duongnd.ecommerceapp.data.request.CartItemRequest
 import com.duongnd.ecommerceapp.data.request.OrderItemRequest
+import com.duongnd.ecommerceapp.data.request.WishlistRequest
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -20,6 +24,7 @@ import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface EcommerceApiService {
     // products
@@ -97,4 +102,15 @@ interface EcommerceApiService {
     ): Response<DataOrder>
 
 
+    // wishlist
+    suspend fun addWishlist(
+        @Header("Authorization") token: String,
+        @Body wishlistRequest: AddToWishlistRequest
+    ): Response<WishlistItem>
+
+    @GET("/wishlist/{userId}")
+    suspend fun getWishlist(
+        @Header("Authorization") token: String,
+        @Path("userId") userId: String
+    ): Response<Wishlist>
 }

@@ -99,6 +99,11 @@ dependencies {
 
     implementation("com.jakewharton.timber:timber:5.0.1")
 
+    // room database
+    implementation ("androidx.room:room-runtime:2.6.1")
+    kapt ("androidx.room:room-compiler:2.6.1")
+    implementation ("androidx.room:room-ktx:2.6.1")
+
     // Socket.io
     implementation ("io.socket:socket.io-client:2.0.0") {
         // excluding org.json which is provided by Android

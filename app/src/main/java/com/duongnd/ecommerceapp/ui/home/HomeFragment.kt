@@ -14,7 +14,7 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
 import com.duongnd.ecommerceapp.R
 import com.duongnd.ecommerceapp.adapter.HomeAdapter
-import com.duongnd.ecommerceapp.data.model.product.DataProduct
+import com.duongnd.ecommerceapp.data.model.product.ProductItem
 import com.duongnd.ecommerceapp.databinding.FragmentHomeBinding
 import com.duongnd.ecommerceapp.ui.bottomsheet.FilterBottomSheetFragment
 import com.duongnd.ecommerceapp.ui.detail.DetailFragment
@@ -29,7 +29,7 @@ class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
     private lateinit var homeAdapter: HomeAdapter
-    private var productList = ArrayList<DataProduct>()
+    private var productList = ArrayList<ProductItem>()
     private var isImageHeartSelected = false
 
     private val viewModel: NewHomeViewModel by viewModels()
@@ -58,7 +58,6 @@ class HomeFragment : Fragment() {
 
         showLoading(true)
         binding.chipGroup.addChip(requireContext(), "All")
-        getAllCategories()
         val firstChip: Chip = binding.chipGroup.getChildAt(0) as Chip
         firstChip.isChecked = true
 
@@ -105,7 +104,7 @@ class HomeFragment : Fragment() {
                     .show()
                 imageButton.setImageResource(R.drawable.ic_heart_filled)
                 // print product name
-                Log.d(TAG, "onViewCreated: ${product.name_product}")
+                Log.d(TAG, "onViewCreated: ${product.product_name}")
             }
 
             isImageHeartSelected = !isImageHeartSelected
@@ -218,25 +217,6 @@ class HomeFragment : Fragment() {
             binding.shimmerFrameLayout.startShimmer()
         } else {
             binding.shimmerFrameLayout.stopShimmer()
-        }
-    }
-
-    private fun getAllCategories() {
-        with(viewModel) {
-            categoriesList.observe(viewLifecycleOwner) {
-                Log.d(TAG, "observeData: $it")
-                it.forEach { category ->
-                    binding.chipGroup.addChip(requireContext(), category.nameCate)
-                }
-            }
-
-            errorMessage.observe(viewLifecycleOwner) {
-                Log.d(TAG, "observeDataError: $it")
-            }
-            loading.observe(viewLifecycleOwner) {
-                Log.d(TAG, "observeDataLoading: $it")
-                showLoading(it)
-            }
         }
     }
 

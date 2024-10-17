@@ -17,12 +17,10 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.duongnd.ecommerceapp.R
-import com.duongnd.ecommerceapp.data.model.product.DataProduct
-import com.squareup.picasso.Callback
-import com.squareup.picasso.Picasso
+import com.duongnd.ecommerceapp.data.model.product.ProductItem
 import java.util.Locale
 
-class HomeAdapter(private val productList: List<DataProduct>, private val context: Context) :
+class HomeAdapter(private val productList: List<ProductItem>, private val context: Context) :
     RecyclerView.Adapter<HomeAdapter.HomeViewHolder>() {
 
 
@@ -45,15 +43,11 @@ class HomeAdapter(private val productList: List<DataProduct>, private val contex
     override fun onBindViewHolder(holder: HomeViewHolder, position: Int) {
         val product = productList[position]
 
-        holder.txtNameProduct.text = product.name_product
-
-
-        val formatPrice = product.price.toString().replace("\\D+".toRegex(), "")
-            .toLong().toString().replace("\\B(?=(\\d{3})+(?!\\d))".toRegex(), ",")
+        holder.txtNameProduct.text = product.product_name
 
         val locale = Locale("vi", "VN")
         val numberFormat = NumberFormat.getInstance(locale)
-        val formattedPrice = numberFormat.format(product.price)
+        val formattedPrice = numberFormat.format(product.product_price)
         holder.txtPriceProduct.text = "$formattedPrice vnđ"
 
         val imgUrl = product.imageUrls
@@ -98,7 +92,7 @@ class HomeAdapter(private val productList: List<DataProduct>, private val contex
 
     }
 
-    var clickToSaved: ((itemView: View, product: DataProduct) -> Unit)? = null
-    var clickToDetail: ((DataProduct) -> Unit)? = null
+    var clickToSaved: ((itemView: View, product: ProductItem) -> Unit)? = null
+    var clickToDetail: ((ProductItem) -> Unit)? = null
 
 }

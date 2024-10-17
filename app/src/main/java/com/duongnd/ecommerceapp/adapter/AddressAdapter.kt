@@ -4,19 +4,11 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.ProgressBar
 import android.widget.RadioButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.duongnd.ecommerceapp.R
 import com.duongnd.ecommerceapp.data.model.address.AddressItem
-import com.duongnd.ecommerceapp.data.model.cart.Cart
-import com.duongnd.ecommerceapp.data.model.cart.ItemCart
-import com.duongnd.ecommerceapp.data.model.product.DataProduct
-import com.squareup.picasso.Callback
-import com.squareup.picasso.Picasso
-import java.lang.Exception
 
 class AddressAdapter(
     private val itemsAddressList: MutableList<AddressItem>,

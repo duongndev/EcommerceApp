@@ -5,7 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duongnd.ecommerceapp.data.model.cart.Cart
-import com.duongnd.ecommerceapp.data.model.product.DataProduct
+import com.duongnd.ecommerceapp.data.model.product.Product
+import com.duongnd.ecommerceapp.data.model.product.ProductItem
 import com.duongnd.ecommerceapp.data.repository.CartRepository
 import com.duongnd.ecommerceapp.data.repository.ProductsRepository
 import com.duongnd.ecommerceapp.data.request.AddToCartRequest
@@ -20,8 +21,8 @@ class DetailViewModel @Inject constructor(
     private val productsRepository: ProductsRepository,
 ) : ViewModel() {
 
-    private val _productsList: MutableLiveData<DataProduct> = MutableLiveData()
-    val productsDetailList: LiveData<DataProduct> = _productsList
+    private val _productsList: MutableLiveData<ProductItem> = MutableLiveData()
+    val productsDetailList: LiveData<ProductItem> = _productsList
 
     private val _cartItem: MutableLiveData<Cart> = MutableLiveData()
     val cartItem: LiveData<Cart> = _cartItem

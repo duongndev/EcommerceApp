@@ -4,9 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duongnd.ecommerceapp.data.model.category.DataCategory
-import com.duongnd.ecommerceapp.data.model.product.DataProduct
-import com.duongnd.ecommerceapp.data.repository.CategoryRepository
+import com.duongnd.ecommerceapp.data.model.product.ProductItem
 import com.duongnd.ecommerceapp.data.repository.ProductsRepository
 import com.duongnd.ecommerceapp.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,15 +15,9 @@ import javax.inject.Inject
 @HiltViewModel
 class NewHomeViewModel @Inject constructor(
     private val productsRepository: ProductsRepository,
-    private val categoryRepository: CategoryRepository
 ) : ViewModel() {
-    private val _productsList: MutableLiveData<List<DataProduct>> = MutableLiveData()
-    val productsList: LiveData<List<DataProduct>> = _productsList
-
-
-    private val _categoriesList: MutableLiveData<List<DataCategory>> = MutableLiveData()
-    val categoriesList: LiveData<List<DataCategory>> = _categoriesList
-
+    private val _productsList: MutableLiveData<List<ProductItem>> = MutableLiveData()
+    val productsList: LiveData<List<ProductItem>> = _productsList
 
     private val _loading: MutableLiveData<Boolean> = MutableLiveData()
     val loading: LiveData<Boolean> = _loading
@@ -34,7 +26,6 @@ class NewHomeViewModel @Inject constructor(
 
     init {
         loadProductsList()
-        loadCategoryList()
     }
 
     fun loadProductsList() = viewModelScope.launch {
@@ -43,32 +34,8 @@ class NewHomeViewModel @Inject constructor(
                 when (response) {
                     is Resource.Success -> {
                         _loading.value = false
-                        val data = response.data!!.products
-                        _productsList.postValue(data)
-                        Timber.d("loadProductsList: $data")
-                    }
-
-                    is Resource.Error -> {
-                        _loading.value = false
-                        _errorMessage.postValue(response.message!!)
-                    }
-
-                    is Resource.Loading -> {
-                        _loading.value = true
-                    }
-                }
-            }
-        }
-    }
-
-    private fun loadCategoryList() = viewModelScope.launch {
-        categoryRepository.getAllCategory().collect { response ->
-            run {
-                when (response) {
-                    is Resource.Success -> {
-                        _loading.value = false
                         val data = response.data!!
-                        _categoriesList.postValue(data)
+                        _productsList.postValue(data)
                         Timber.d("loadProductsList: $data")
                     }
 
@@ -91,7 +58,7 @@ class NewHomeViewModel @Inject constructor(
                 when (response) {
                     is Resource.Success -> {
                         _loading.value = false
-                        val data = response.data!!.products
+                        val data = response.data!!
                         _productsList.postValue(data)
                         Timber.d("loadProductByCategoryName: $data")
                     }

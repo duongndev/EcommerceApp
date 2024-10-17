@@ -1,18 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.checkout.fragment.CheckoutHomeFragment">
-
-    <androidx.core.widget.NestedScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -152,6 +144,7 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerView_items_checkout"
                 android:layout_width="match_parent"
+                android:visibility="gone"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/listView_items_checkout_payment"
                 android:layout_alignParentStart="true"
@@ -192,22 +185,23 @@
                     android:textSize="24sp" />
             </LinearLayout>
 
+
+            <Button
+                android:id="@+id/btt_place_order"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentEnd="true"
+                android:layout_below="@id/layout_totalPrice"
+                android:layout_alignParentBottom="true"
+                android:layout_marginStart="25dp"
+                android:layout_marginEnd="25dp"
+                android:layout_marginBottom="30dp"
+                android:background="@drawable/bg_button"
+                android:fontFamily="@font/general_sans_medium"
+                android:text="Place Order"
+                android:textSize="16sp" />
         </RelativeLayout>
-    </androidx.core.widget.NestedScrollView>
 
-    <Button
-        android:id="@+id/btt_place_order"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginStart="25dp"
-        android:layout_marginEnd="25dp"
-        android:layout_marginBottom="30dp"
-        android:background="@drawable/bg_button"
-        android:fontFamily="@font/general_sans_medium"
-        android:text="Place Order"
-        android:textSize="16sp" />
 
-</RelativeLayout>
+</ScrollView>

@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duongnd.ecommerceapp.data.model.wishlist.Wishlist
 import com.duongnd.ecommerceapp.data.repository.WishlistRepository
-import com.duongnd.ecommerceapp.utils.MultipleLiveEvent
 import com.duongnd.ecommerceapp.utils.Resource
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -16,7 +15,7 @@ class WishlistViewModel @Inject constructor(
     private val wishlistRepository: WishlistRepository
 ) : ViewModel() {
 
-    private val _wishlistItems: MultipleLiveEvent<Wishlist> = MultipleLiveEvent()
+    private val _wishlistItems: MutableLiveData<Wishlist> = MutableLiveData()
     val wishlistItems: LiveData<Wishlist> = _wishlistItems
 
     private val _loading: MutableLiveData<Boolean> = MutableLiveData()

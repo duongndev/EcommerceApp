@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.duongnd.ecommerceapp.data.model.login.DataLogin
 import com.duongnd.ecommerceapp.data.model.login.LoginRequest
 import com.duongnd.ecommerceapp.data.repository.AuthRepository
-import com.duongnd.ecommerceapp.utils.MultipleLiveEvent
 import com.duongnd.ecommerceapp.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -17,7 +16,7 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(private val authRepository: AuthRepository) : ViewModel() {
 
-    private val _dataLogin: MultipleLiveEvent<DataLogin> = MultipleLiveEvent()
+    private val _dataLogin: MutableLiveData<DataLogin> = MutableLiveData()
     val dataLogin: LiveData<DataLogin> = _dataLogin
 
     private val _loading: MutableLiveData<Boolean> = MutableLiveData()

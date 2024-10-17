@@ -2,12 +2,11 @@ package com.duongnd.ecommerceapp.data.api
 
 import com.duongnd.ecommerceapp.data.model.address.Address
 import com.duongnd.ecommerceapp.data.model.cart.Cart
-import com.duongnd.ecommerceapp.data.model.category.Category
+import com.duongnd.ecommerceapp.data.model.goship.GoShipCity
 import com.duongnd.ecommerceapp.data.model.login.DataLogin
 import com.duongnd.ecommerceapp.data.model.order.DataOrder
-import com.duongnd.ecommerceapp.data.model.order.Order
-import com.duongnd.ecommerceapp.data.model.product.DataProduct
-import com.duongnd.ecommerceapp.data.model.product.Products
+import com.duongnd.ecommerceapp.data.model.product.Product
+import com.duongnd.ecommerceapp.data.model.product.ProductItem
 import com.duongnd.ecommerceapp.data.model.wishlist.Wishlist
 import com.duongnd.ecommerceapp.utils.Resource
 import retrofit2.Response
@@ -34,8 +33,8 @@ abstract class ApiResponse {
     }
 
     suspend fun safeApiCallProducts(
-        apiCall: suspend () -> Response<Products>
-    ): Resource<Products> {
+        apiCall: suspend () -> Response<Product>
+    ): Resource<Product> {
         try {
             Timber.tag("ApiResponse").d("checking...")
             val response = apiCall()
@@ -52,26 +51,8 @@ abstract class ApiResponse {
     }
 
     suspend fun safeApiCallProductsDetail(
-        apiCall: suspend () -> Response<DataProduct>
-    ): Resource<DataProduct> {
-        try {
-            Timber.tag("ApiResponse").d("checking...")
-            val response = apiCall()
-            if (response.isSuccessful) {
-                val body = response.body()
-                body?.let {
-                    return Resource.Success(body)
-                }
-            }
-            return error("${response.code()} ${response.message()}")
-        } catch (e: Exception) {
-            return error(e.message ?: e.toString())
-        }
-    }
-
-    suspend fun safeApiCallCategory(
-        apiCall: suspend () -> Response<Category>
-    ): Resource<Category> {
+        apiCall: suspend () -> Response<ProductItem>
+    ): Resource<ProductItem> {
         try {
             Timber.tag("ApiResponse").d("checking...")
             val response = apiCall()
@@ -159,6 +140,24 @@ abstract class ApiResponse {
         }
     }
 
+
+    suspend fun safeApiCallCityGoShip(
+        apiCall: suspend () -> Response<GoShipCity>
+    ): Resource<GoShipCity> {
+        try {
+            Timber.tag("ApiResponse").d("checking...")
+            val response = apiCall()
+            if (response.isSuccessful) {
+                val body = response.body()
+                body?.let {
+                    return Resource.Success(body)
+                }
+            }
+            return error("${response.code()} ${response.message()}")
+        } catch (e: Exception) {
+            return error(e.message ?: e.toString())
+        }
+    }
 
 
     private fun <T> error(errorMessage: String): Resource<T> =

@@ -3,7 +3,6 @@ package com.duongnd.ecommerceapp.viewmodel.auth.login
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.duongnd.ecommerceapp.data.repository.AuthRepository
-import com.duongnd.ecommerceapp.data.repository.MyRepository
 
 class LoginViewModelFactory(private val authRepository: AuthRepository) : ViewModelProvider.Factory {
 

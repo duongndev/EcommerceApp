@@ -8,10 +8,9 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.duongnd.ecommerceapp.R
 import com.duongnd.ecommerceapp.data.model.cart.ItemCart
-import com.squareup.picasso.Callback
-import com.squareup.picasso.Picasso
 import java.util.Locale
 
 
@@ -52,17 +51,12 @@ class CartAdapter(
 
         holder.txtNameProductCart.text = itemCart.name
         holder.quantityProductCart.text = itemCart.quantity.toString()
-        Picasso.get()
-            .load(itemCart.image)
-            .into(holder.imgProductCart, object : Callback {
-                override fun onSuccess() {
-                    holder.progressBarProductCart.visibility = View.GONE
-                }
 
-                override fun onError(e: Exception?) {
-                    holder.progressBarProductCart.visibility = View.GONE
-                }
-            })
+        Glide.with(context)
+            .load(itemCart.image)
+            .into(holder.imgProductCart)
+
+
 
         holder.plusProductCart.setOnClickListener {
            incrementQuantity?.invoke(itemsCartList[position])

@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duongnd.ecommerceapp.data.model.address.Address
 import com.duongnd.ecommerceapp.data.repository.AddressRepository
-import com.duongnd.ecommerceapp.utils.MultipleLiveEvent
 import com.duongnd.ecommerceapp.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -17,7 +16,7 @@ class AddressViewModel @Inject constructor(
     private val addressRepository: AddressRepository
 ):ViewModel() {
 
-    private val _addressItem: MultipleLiveEvent<Address> = MultipleLiveEvent()
+    private val _addressItem: MutableLiveData<Address> = MutableLiveData()
     val allAddressItem: LiveData<Address> = _addressItem
 
     private val _loading: MutableLiveData<Boolean> = MutableLiveData()

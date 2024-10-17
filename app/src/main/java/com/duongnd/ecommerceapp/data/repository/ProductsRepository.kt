@@ -3,8 +3,8 @@ package com.duongnd.ecommerceapp.data.repository
 import com.duongnd.ecommerceapp.data.api.ApiResponse
 import com.duongnd.ecommerceapp.data.api.EcommerceApiService
 import com.duongnd.ecommerceapp.data.model.cart.Cart
-import com.duongnd.ecommerceapp.data.model.product.DataProduct
-import com.duongnd.ecommerceapp.data.model.product.Products
+import com.duongnd.ecommerceapp.data.model.product.Product
+import com.duongnd.ecommerceapp.data.model.product.ProductItem
 import com.duongnd.ecommerceapp.data.request.AddToCartRequest
 import com.duongnd.ecommerceapp.utils.Resource
 import kotlinx.coroutines.Dispatchers
@@ -16,7 +16,7 @@ import javax.inject.Inject
 class ProductsRepository @Inject constructor(
     private val ecommerceApiService: EcommerceApiService
 ) : ApiResponse() {
-    suspend fun getAllProducts(): Flow<Resource<Products>> {
+    suspend fun getAllProducts(): Flow<Resource<Product>> {
         return flow {
             emit(safeApiCallProducts {
                 ecommerceApiService.getAllProducts()
@@ -24,7 +24,7 @@ class ProductsRepository @Inject constructor(
         }.flowOn(Dispatchers.IO)
     }
 
-    suspend fun getProductById(id: String): Flow<Resource<DataProduct>> {
+    suspend fun getProductById(id: String): Flow<Resource<ProductItem>> {
         return flow {
             emit(safeApiCallProductsDetail{
                 ecommerceApiService.getProductById(id)
@@ -32,7 +32,7 @@ class ProductsRepository @Inject constructor(
         }.flowOn(Dispatchers.IO)
     }
 
-    suspend fun getProductsByCategoryName(name: String): Flow<Resource<Products>> {
+    suspend fun getProductsByCategoryName(name: String): Flow<Resource<Product>> {
         return flow {
             emit(safeApiCallProducts{
                 ecommerceApiService.getProductsByCategoryName(name)

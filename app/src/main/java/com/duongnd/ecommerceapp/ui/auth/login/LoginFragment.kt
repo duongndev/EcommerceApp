@@ -88,7 +88,7 @@ class LoginFragment : Fragment() {
             if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email)
                     .matches() && password.isEmpty()
             ) {
-                binding.inputLayoutEmailLogin.error = "Email    is required"
+                binding.inputLayoutEmailLogin.error = "Email is required"
                 binding.inputLayoutPasswordLogin.error = "Password is required"
                 binding.btnLogin.isEnabled = false
             } else {
@@ -108,20 +108,15 @@ class LoginFragment : Fragment() {
         with(loginViewModel){
             loginUser(loginRequest)
             dataLogin.observe(viewLifecycleOwner){
-                if (it.success) {
-                    progressDialog.stop()
-                    Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
-                } else {
+
                     binding.edtEmailLogin.setText("")
                     binding.edtPasswordLogin.setText("")
                     binding.inputLayoutEmailLogin.error = null
                     binding.inputLayoutPasswordLogin.error = null
                     sessionManager.setToken(it.token)
-                    sessionManager.setUserId(it.userId)
                     startActivity(Intent(requireContext(), MainActivity::class.java))
                     requireActivity().finish()
                     progressDialog.stop()
-                }
             }
             loading.observe(viewLifecycleOwner){
                 progressDialog.stop()
@@ -129,7 +124,7 @@ class LoginFragment : Fragment() {
             }
             errorMessage.observe(viewLifecycleOwner){
                 progressDialog.stop()
-                Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Wrong email or password", Toast.LENGTH_SHORT).show()
                 Log.e(TAG, "getLogin: $it")
             }
 

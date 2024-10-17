@@ -15,10 +15,10 @@ import javax.inject.Inject
 class CartRepository @Inject constructor(
     private val ecommerceApiService: EcommerceApiService
 ): ApiResponse() {
-    suspend fun getUsersCart(id: String, token: String): Flow<Resource<Cart>> {
+    suspend fun getUsersCart(token: String): Flow<Resource<Cart>> {
         return flow {
             emit(safeApiCallCart {
-                ecommerceApiService.getUserCart(id, token)
+                ecommerceApiService.getUserCart(token)
             })
         }.flowOn(Dispatchers.IO)
     }

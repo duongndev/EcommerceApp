@@ -3,10 +3,12 @@ package com.duongnd.ecommerceapp.ui
 import android.os.Bundle
 import android.view.View
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.duongnd.ecommerceapp.R
 import com.duongnd.ecommerceapp.databinding.ActivityMainBinding
+import com.duongnd.ecommerceapp.di.AppModule
 import com.duongnd.ecommerceapp.ui.account.AccountFragment
 import com.duongnd.ecommerceapp.ui.cart.CartFragment
 import com.duongnd.ecommerceapp.ui.home.HomeFragment
@@ -36,6 +38,7 @@ class MainActivity : AppCompatActivity() {
             }
             true
         }
+
 
     }
 

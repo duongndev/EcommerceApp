@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.duongnd.ecommerceapp.adapter.CartAdapter
 import com.duongnd.ecommerceapp.data.model.cart.ItemCart
@@ -32,9 +33,7 @@ class CartFragment : Fragment() {
     private var cartItemList = ArrayList<ItemCart>()
     private val sessionManager = SessionManager()
 
-    private val cartViewModel: CartViewModel by viewModels {
-        CartViewModelFactory(CartRepository(ecommerceApiService = AppModule.provideApi()))
-    }
+    private val cartViewModel: CartViewModel by activityViewModels()
 
     private val progressDialog by lazy { CustomProgressDialog(requireContext()) }
 
@@ -60,12 +59,11 @@ class CartFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val userId = sessionManager.getUserId()!!
         val token = sessionManager.getToken()!!
 
         progressDialog.start("Loading Cart...")
         Handler(Looper.getMainLooper()).postDelayed({
-            getCartItemList(userId, token)
+            getCartItemList(token)
         }, 2000)
 
         cartAdapter.incrementQuantity = {
@@ -92,9 +90,9 @@ class CartFragment : Fragment() {
 
     }
 
-    private fun getCartItemList(userId: String, token: String) {
+    private fun getCartItemList(token: String) {
         with(cartViewModel) {
-            getUserCart(userId, token)
+            getUserCart(token)
             cartItems.observe(viewLifecycleOwner) {
                 Log.d(TAG, "onViewCreated: $it")
                 if (it.itemsCart.isEmpty()) {

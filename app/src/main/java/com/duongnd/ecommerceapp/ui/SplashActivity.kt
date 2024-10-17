@@ -9,12 +9,19 @@ import android.util.Base64
 import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.viewmodel.viewModelFactory
 import com.duongnd.ecommerceapp.R
+import com.duongnd.ecommerceapp.data.repository.CheckoutRepository
+import com.duongnd.ecommerceapp.di.AppModule
 import com.duongnd.ecommerceapp.utils.SessionManager
 import com.duongnd.ecommerceapp.view.auth.AuthActivity
+import com.duongnd.ecommerceapp.viewmodel.checkout.CheckoutViewModel
+import com.duongnd.ecommerceapp.viewmodel.checkout.CheckoutViewModelFactory
 import dagger.hilt.android.AndroidEntryPoint
 import org.json.JSONObject
 import java.util.Date
+import kotlin.getValue
 
 @AndroidEntryPoint
 @SuppressLint("CustomSplashScreen")
@@ -34,9 +41,7 @@ class SplashActivity : AppCompatActivity() {
 
         Handler(Looper.getMainLooper()).postDelayed({
             val token = sessionManager.getToken()
-            val userId = sessionManager.getUserId()
             Log.d(TAG, "onCreate:  token: $token")
-            Log.d(TAG, "onCreate:  userId: $userId")
             val isValidToken = checkToken(token!!)
             if (isValidToken) {
                 val intent = Intent(this, MainActivity::class.java)
@@ -72,13 +77,6 @@ class SplashActivity : AppCompatActivity() {
                 // So sánh thời gian hết hạn với thời gian hiện tại
                 val now = Date().time / 1000
                 return now < exp
-            }
-            // lấy giá trị của id (user id) trong payload
-            if (payloadJson.has("id")) {
-                val userId = payloadJson.getString("id")
-                Log.d(TAG, "checkToken - userId: $userId")
-                sessionManager.setUserId(userId)
-                return true
             }
             return false
         } catch (e: Exception) {

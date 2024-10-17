@@ -7,13 +7,9 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.duongnd.ecommerceapp.R
-import com.duongnd.ecommerceapp.data.model.cart.Cart
 import com.duongnd.ecommerceapp.data.model.cart.ItemCart
-import com.duongnd.ecommerceapp.data.model.product.DataProduct
-import com.squareup.picasso.Callback
-import com.squareup.picasso.Picasso
-import java.lang.Exception
 
 class CheckoutAdapter(
     private val itemsCartList: MutableList<ItemCart>,
@@ -43,18 +39,10 @@ class CheckoutAdapter(
         holder.txtNameProductCart.text = itemCart.name
         holder.txtPriceProductCart.text = "$formatPrice vnđ"
         holder.quantityProductCart.text = "x${itemCart.quantity}"
-        Picasso.get()
+
+        Glide.with(context)
             .load(itemCart.image)
-            .into(holder.imgProductCart, object : Callback {
-                override fun onSuccess() {
-                    holder.progressBarProductCart.visibility = View.GONE
-                }
-
-                override fun onError(e: Exception?) {
-                    holder.progressBarProductCart.visibility = View.GONE
-                }
-            })
-
+            .into(holder.imgProductCart)
     }
 
 

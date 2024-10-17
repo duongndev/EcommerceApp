@@ -2,7 +2,6 @@ package com.duongnd.ecommerceapp.di
 
 import com.duongnd.ecommerceapp.data.api.EcommerceApiService
 import com.duongnd.ecommerceapp.utils.Constants.Companion.BASE_URL1
-import com.duongnd.ecommerceapp.utils.Constants.Companion.BASE_URL2
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -14,6 +13,7 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
+
     @Provides
     @Singleton
     fun provideApi(): EcommerceApiService {
@@ -21,4 +21,6 @@ object AppModule {
             .addConverterFactory(GsonConverterFactory.create()).build()
             .create(EcommerceApiService::class.java)
     }
+
+
 }

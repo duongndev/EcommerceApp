@@ -2,8 +2,6 @@ package com.duongnd.ecommerceapp.viewmodel.detail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.duongnd.ecommerceapp.data.repository.CartRepository
-import com.duongnd.ecommerceapp.data.repository.MyRepository
 import com.duongnd.ecommerceapp.data.repository.ProductsRepository
 
 class DetailViewModelFactory(

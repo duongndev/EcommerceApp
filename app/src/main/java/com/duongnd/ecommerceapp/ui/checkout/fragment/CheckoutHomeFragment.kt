@@ -15,24 +15,19 @@ import androidx.fragment.app.viewModels
 import com.duongnd.ecommerceapp.R
 import com.duongnd.ecommerceapp.adapter.CheckoutAdapter
 import com.duongnd.ecommerceapp.data.model.cart.ItemCart
-import com.duongnd.ecommerceapp.data.model.order.Order
-import com.duongnd.ecommerceapp.data.model.order.OrderItem
 import com.duongnd.ecommerceapp.data.repository.CheckoutRepository
 import com.duongnd.ecommerceapp.data.request.OrderItemRequest
 import com.duongnd.ecommerceapp.databinding.FragmentCheckoutHomeBinding
 import com.duongnd.ecommerceapp.di.AppModule
 import com.duongnd.ecommerceapp.utils.CustomProgressDialog
 import com.duongnd.ecommerceapp.utils.SessionManager
-import com.duongnd.ecommerceapp.utils.SocketManager
 import com.duongnd.ecommerceapp.viewmodel.checkout.CheckoutViewModel
 import com.duongnd.ecommerceapp.viewmodel.checkout.CheckoutViewModelFactory
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
-import com.google.gson.Gson
 import io.socket.client.IO
 import io.socket.client.Socket
 import io.socket.emitter.Emitter
-import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
 import timber.log.Timber
 import java.net.URISyntaxException
@@ -45,8 +40,9 @@ class CheckoutHomeFragment : Fragment() {
     private val sessionManager = SessionManager()
 
     private val checkoutViewModel: CheckoutViewModel by viewModels {
-        CheckoutViewModelFactory(CheckoutRepository(ecommerceApiService = AppModule.provideApi()))
+        CheckoutViewModelFactory(checkoutRepository = CheckoutRepository(ecommerceApiService = AppModule.provideApi()))
     }
+
     private val progressDialog by lazy { CustomProgressDialog(requireContext()) }
 
     val TAG = "CheckoutHomeFragment"
@@ -276,6 +272,7 @@ class CheckoutHomeFragment : Fragment() {
     private val onConnect = Emitter.Listener {
         Timber.d("onConnect: $it")
     }
+
 
     private val newOrder = Emitter.Listener {
         val data = it[0] as JSONObject

@@ -16,7 +16,7 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.duongnd.ecommerceapp.R
-import com.duongnd.ecommerceapp.data.model.product.DataProduct
+import com.duongnd.ecommerceapp.data.model.product.ProductItem
 import com.duongnd.ecommerceapp.data.model.wishlist.WishlistItem
 
 class WishlistAdapter(private val productList: List<WishlistItem>, private val context: Context) :
@@ -81,6 +81,6 @@ class WishlistAdapter(private val productList: List<WishlistItem>, private val c
 }
 
 var clickToSaved: ((itemView: View, product: WishlistItem) -> Unit)? = null
-var clickToDetail: ((DataProduct) -> Unit)? = null
+    var clickToDetail: ((ProductItem) -> Unit)? = null
 
 }

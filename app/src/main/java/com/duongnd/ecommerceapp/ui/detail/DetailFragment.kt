@@ -14,27 +14,21 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.duongnd.ecommerceapp.R
-import com.duongnd.ecommerceapp.data.repository.CartRepository
-import com.duongnd.ecommerceapp.data.repository.ProductsRepository
 import com.duongnd.ecommerceapp.data.request.AddToCartRequest
 import com.duongnd.ecommerceapp.databinding.FragmentDetailBinding
-import com.duongnd.ecommerceapp.di.AppModule
 import com.duongnd.ecommerceapp.ui.MainActivity
 import com.duongnd.ecommerceapp.utils.CustomProgressDialog
-import com.duongnd.ecommerceapp.utils.FormatPriceToVietnamese
 import com.duongnd.ecommerceapp.utils.SessionManager
 import com.duongnd.ecommerceapp.viewmodel.detail.DetailViewModel
-import com.duongnd.ecommerceapp.viewmodel.detail.DetailViewModelFactory
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
-import com.squareup.picasso.Picasso
 import timber.log.Timber
 import java.util.Locale
 
@@ -45,9 +39,7 @@ class DetailFragment : Fragment() {
 
     private val sessionManager = SessionManager()
 
-    private val detailViewModel: DetailViewModel by viewModels{
-        DetailViewModelFactory(ProductsRepository(ecommerceApiService = AppModule.provideApi()))
-    }
+    private val detailViewModel: DetailViewModel by activityViewModels()
 
     private val progressDialog by lazy { CustomProgressDialog(requireContext()) }
 
@@ -91,10 +83,9 @@ class DetailFragment : Fragment() {
 
         binding.btnAddToCart.setOnClickListener {
             val token = sessionManager.getToken()!!
-            val userId = sessionManager.getUserId()!!
             val quantity = binding.txtQuantityProductDetail.text.toString().toInt()
             progressDialog.start("Đang thêm sản phẩm vào giỏ hàng...")
-            addProductToCart(token, AddToCartRequest(userId, productId, quantity))
+            addProductToCart(token, AddToCartRequest(productId, quantity))
         }
     }
 
@@ -106,12 +97,12 @@ class DetailFragment : Fragment() {
                 productsDetailList.observe(viewLifecycleOwner) {
                     Log.d(TAG, "getProductById: $it")
                     productId = it._id
-                    binding.txtTitleProductDetail.text = it.name_product
+                    binding.txtTitleProductDetail.text = it.product_name
                     val locale = Locale("vi", "VN")
                     val numberFormat = NumberFormat.getInstance(locale)
-                    val formattedPrice = numberFormat.format(it.price)
+                    val formattedPrice = numberFormat.format(it.product_price)
                     binding.txtPriceProductDetail.text = "$formattedPrice đ"
-                    binding.txtDescriptionProductDetail.text = it.description
+                    binding.txtDescriptionProductDetail.text = it.product_desc
                     it.size.forEach { size ->
                         binding.chipGroupSizeProductDetail.addChip(requireContext(), size.toString())
                     }

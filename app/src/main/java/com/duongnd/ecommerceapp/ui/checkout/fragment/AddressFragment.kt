@@ -8,22 +8,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duongnd.ecommerceapp.adapter.AddressAdapter
-import com.duongnd.ecommerceapp.data.api.RetrofitClient
 import com.duongnd.ecommerceapp.data.model.address.AddressItem
-import com.duongnd.ecommerceapp.data.repository.AddressRepository
-import com.duongnd.ecommerceapp.data.repository.MyRepository
 import com.duongnd.ecommerceapp.databinding.FragmentAddressBinding
-import com.duongnd.ecommerceapp.di.AppModule
 import com.duongnd.ecommerceapp.utils.CustomProgressDialog
 import com.duongnd.ecommerceapp.utils.SessionManager
 import com.duongnd.ecommerceapp.viewmodel.address.AddressViewModel
-import com.duongnd.ecommerceapp.viewmodel.address.AddressViewModelFactory
-import com.duongnd.ecommerceapp.viewmodel.checkout.CheckoutViewModel
-import com.duongnd.ecommerceapp.viewmodel.checkout.CheckoutViewModelFactory
 
 class AddressFragment : Fragment() {
 
@@ -32,9 +24,7 @@ class AddressFragment : Fragment() {
     private lateinit var addressAdapter: AddressAdapter
     private val sessionManager = SessionManager()
 
-    private val addressViewModel: AddressViewModel by viewModels {
-        AddressViewModelFactory(AddressRepository(ecommerceApiService = AppModule.provideApi()))
-    }
+    private val addressViewModel: AddressViewModel by activityViewModels()
 
     private val progressDialog by lazy { CustomProgressDialog(requireContext()) }
 

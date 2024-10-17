@@ -1,7 +1,7 @@
 package com.duongnd.ecommerceapp.utils
 
 import android.annotation.SuppressLint
-import android.support.annotation.Nullable
+import androidx.annotation.Nullable
 import io.socket.client.Ack
 import io.socket.client.IO
 import io.socket.client.Socket

@@ -20,7 +20,7 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField("String", "SANBOX_GOSHIP_URL", "\"http://sandbox.goship.io/api/v2/\"")
-        buildConfigField("String", "SANBOX_GOSHIP_TOKEN", "\"eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6ImExY2Q4MTY2NTQ1ZmVlNzNiNThlNWU3OGIzMzY3MDFiNDMzM2I3MTJlYmVjNzQ2YzJkM2Q0MGE3MWM0OWNhODc3NmZiNzg5MTA3OGJiNWY5In0.eyJhdWQiOiIxMyIsImp0aSI6ImExY2Q4MTY2NTQ1ZmVlNzNiNThlNWU3OGIzMzY3MDFiNDMzM2I3MTJlYmVjNzQ2YzJkM2Q0MGE3MWM0OWNhODc3NmZiNzg5MTA3OGJiNWY5IiwiaWF0IjoxNzI4NjU0MzkzLCJuYmYiOjE3Mjg2NTQzOTMsImV4cCI6MjA0NDE4NzE5Mywic3ViIjoiMzMyNCIsInNjb3BlcyI6W119.B_HlHlZuaqE4HghY9b4uZoH6idQeuJjKSQHt6XqWSUXdwU5biyq1sdR8hu3sSGxa97Su6SAzrEoy5xpXLCk3md4dGKPOE_OVUZcIStiRSNy1ME6JgfAy53tt3h47kItVUW6inGRBbspSyabUXsc0sc5iovLhRutnnzTW5wKSo298RhLgBYc8CYiRzdjAOU2_YsgKeSh9XRUutk4mYpkFp6KPTxBzSi4z5q6uo0gfP6H3B_R5TmH6aY6d67RPXEWi3GzfFIifS7bFVRt_5sZbi6YHXjVGe_DXCFGkb3YbDo-KTtG-jRpo9N8ruAN8Nfg_91bmV8KQw4m8dfO0in35q068AHKq3ScUvjCIQawfWZNuMtHgVCUfXO8VwTxBi0gBfEYs-JCo7dDrQUs7-v0y1n794xHD24xp4wkx_2cgLXVpQrt_VxFMCPFpGg22OIXrOq34xucpzLrjEfByrSwmOMd2Dq8amH3VwKAVrMl8-D3-kAKoiaRyTKhvOAlAPk89LHpsaFXnY-SC0GmvLAhh2WndMCPGleEwkKjLN5N6qVlCsCHbl-vbPmGjqLiQpY-uDeCw65QgXB1b8juzLnf8JIzxVL1c__DVGc-GZjTkyw4LHL2qQEg8UjR21ojTEtZ3LzasK1_WlnxI0hZon47Zma0DCKrG2VFJhEwJmHup8Mw\"")
+        buildConfigField("String", "SANBOX_GOSHIP_TOKEN", "\"eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6IjM0ZWE5OGU0YTBjZTM2ZjFlNjhlOGE5OWYyYmExM2U4OTkxYTBkY2MwMjg2NDVmYWY4M2QzNTVhNjcwNzE5MjVjMjA3OTk5MTc3NWEwZWExIn0.eyJhdWQiOiIxMyIsImp0aSI6IjM0ZWE5OGU0YTBjZTM2ZjFlNjhlOGE5OWYyYmExM2U4OTkxYTBkY2MwMjg2NDVmYWY4M2QzNTVhNjcwNzE5MjVjMjA3OTk5MTc3NWEwZWExIiwiaWF0IjoxNzI5MjI4NTIxLCJuYmYiOjE3MjkyMjg1MjEsImV4cCI6MjA0NDc2MTMyMSwic3ViIjoiMzMyNCIsInNjb3BlcyI6W119.cy7n-tCAamLyiFGDiDu2z2KmfdsOFB0tmVHUVC5f0tN6sXhfeqwHBOidh9Blzj66Jgsy6yajjjSw8uRMrVpl9YZPfllyD8re_05Ex8iGXj7pZ-jEI_gi0IyLj23ujG2J3SuZXg7mkl5Obt8iCWFTZT5zzGB12rtPal6Y4Qt_aS_Glbt9HsmoJeOUnak4qPfkEEbi5rwOTlZXyxMr9AJCGz4pSmOpa2dI_zQn_L_gvK1nW-XFIClhStJO1npxJRmT3TLVEnvUojZp6mgysYZtjCH5uqZcfsabUTBnUKmFKz6Ux3N-qCgr3UvJFGIk5QccVQHf1hzy1GOmMMky9e9wQZpWfxU1EtlZXrA2UFxMjbdaPBCesLH0yzTJ_zcY60P7vcQ6q_X4GqDM0olvu80PssA3ANvlrvCfZklpXrlGdu-LCQaisgzQjCHqvbTURAgUqmCFKXInqUvU9fqjTYSsV-44QoS3KssjHrCYU5Y45-qT3DxTJjrg_p2X_sQzzoE71pxNAQf4nz96z5bFibdGVDceteR-86gLdRa_-1jGFBZf9LthuGugTOPTZKmXBHKzvuYywOfM5m6vJBVD27LAxIHvkjcWBvpkELaeBwMaS9vQUdRW2bZHJ9JdM5deAIe0yIZJ4OV5fveW6sAjfe0JIITArItdzfLdiz9FUmhblMY\"")
     }
 
     buildTypes {
@@ -42,9 +42,7 @@ android {
 
     buildFeatures {
         viewBinding = true
-        dataBinding = true
         buildConfig = true
-
     }
 }
 
@@ -68,6 +66,11 @@ dependencies {
     implementation ("com.github.erkutaras:StateLayout:1.5.0")
     implementation ("com.facebook.shimmer:shimmer:0.5.0")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
+    implementation ("com.squareup.logcat:logcat:0.1")
+    implementation("com.github.taimoorsultani:android-sweetalert2:2.0.2")
+
+    // splash
+    implementation ("androidx.core:core-splashscreen:1.0.1")
 
     // navigation
     implementation ("androidx.navigation:navigation-fragment-ktx:2.8.2")
@@ -81,7 +84,7 @@ dependencies {
     implementation ("androidx.lifecycle:lifecycle-livedata-ktx:2.8.6")
     implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.8.6")
     //noinspection LifecycleAnnotationProcessorWithJava8
-    kapt ("androidx.lifecycle:lifecycle-compiler:2.8.3")
+    kapt ("androidx.lifecycle:lifecycle-compiler:2.8.6")
 
     // retrofit - okhttp
     implementation ("com.squareup.retrofit2:retrofit:2.11.0")

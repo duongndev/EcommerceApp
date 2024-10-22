@@ -15,6 +15,7 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -26,10 +27,11 @@ import com.duongnd.ecommerceapp.databinding.FragmentDetailBinding
 import com.duongnd.ecommerceapp.ui.MainActivity
 import com.duongnd.ecommerceapp.utils.CustomProgressDialog
 import com.duongnd.ecommerceapp.utils.SessionManager
+import com.duongnd.ecommerceapp.utils.UiState
 import com.duongnd.ecommerceapp.viewmodel.detail.DetailViewModel
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
-import timber.log.Timber
+import kotlinx.coroutines.launch
 import java.util.Locale
 
 class DetailFragment : Fragment() {
@@ -92,63 +94,66 @@ class DetailFragment : Fragment() {
     @SuppressLint("SetTextI18n")
     private fun getProductById(id: String) {
         Handler(Looper.getMainLooper()).postDelayed({
-            with(detailViewModel) {
+            lifecycleScope.launch {
                 detailViewModel.getProductById(id)
-                productsDetailList.observe(viewLifecycleOwner) {
-                    Log.d(TAG, "getProductById: $it")
-                    productId = it._id
-                    binding.txtTitleProductDetail.text = it.product_name
-                    val locale = Locale("vi", "VN")
-                    val numberFormat = NumberFormat.getInstance(locale)
-                    val formattedPrice = numberFormat.format(it.product_price)
-                    binding.txtPriceProductDetail.text = "$formattedPrice đ"
-                    binding.txtDescriptionProductDetail.text = it.product_desc
-                    it.size.forEach { size ->
-                        binding.chipGroupSizeProductDetail.addChip(requireContext(), size.toString())
+                detailViewModel.productsList.collect {
+                    if (it is UiState.Success) {
+                        showLoading(false)
+                        val product = it.data
+                        product.forEach { productItem ->
+                            productId = productItem._id
+                            binding.txtTitleProductDetail.text = productItem.product_name
+                            binding.txtPriceProductDetail.text = NumberFormat
+                                .getCurrencyInstance(Locale("vi", "VN"))
+                                .format(productItem.product_price)
+
+                            binding.txtDescriptionProductDetail.text = productItem.product_desc
+
+
+                            val imgUrl = productItem.imageUrls
+                            imgUrl.forEach { url ->
+                                Glide.with(requireContext())
+                                    .load(url.secure_url)
+                                    .listener(object : RequestListener<Drawable> {
+                                        override fun onLoadFailed(
+                                            e: GlideException?,
+                                            model: Any?,
+                                            target: Target<Drawable?>,
+                                            isFirstResource: Boolean
+                                        ): Boolean {
+                                            binding.progressBarProductDetail.visibility = View.VISIBLE
+                                            return false
+                                        }
+
+                                        override fun onResourceReady(
+                                            resource: Drawable,
+                                            model: Any,
+                                            target: Target<Drawable?>?,
+                                            dataSource: DataSource,
+                                            isFirstResource: Boolean
+                                        ): Boolean {
+                                            binding.progressBarProductDetail.visibility = View.GONE
+                                            return false
+                                        }
+                                    })
+                                    .into(binding.imgProductDetails)
+                            }
+
+                        }
+
                     }
-                    it.imageUrls.forEach { image ->
-                       Glide.with(requireContext())
-                           .load(image.secure_url)
-                           .listener(object : RequestListener<Drawable> {
-                               override fun onLoadFailed(
-                                   e: GlideException?,
-                                   model: Any?,
-                                   target: Target<Drawable>,
-                                   isFirstResource: Boolean
-                               ): Boolean {
-                                   binding.progressBarProductDetail.visibility = View.VISIBLE
-                                   return false
-                               }
 
-                               override fun onResourceReady(
-                                   resource: Drawable,
-                                   model: Any,
-                                   target: Target<Drawable>?,
-                                   dataSource: DataSource,
-                                   isFirstResource: Boolean
-                               ): Boolean {
-                                   binding.progressBarProductDetail.visibility = View.GONE
-                                   return false
-                               }
-
-                           })
-                           .into(binding.imgProductDetails)
-
+                    if (it is UiState.Error) {
+                        Log.d(TAG, "getProductById: ${it.message}")
                     }
 
-                    showLoading(false)
+                    if (it is UiState.Loading) {
+                        showLoading(true)
+                    }
 
-                }
-                errorMessage.observe(viewLifecycleOwner) {
-                    showLoading(false)
-                    progressDialog.stop()
-                    Timber.tag(TAG).d("getProductById: " + it)
-                }
-                loading.observe(viewLifecycleOwner) {
-                    showLoading(it)
                 }
             }
-        }, 2000)
+        }, 3000)
     }
 
     private fun showLoading(isLoading: Boolean) {
@@ -164,22 +169,7 @@ class DetailFragment : Fragment() {
     }
 
     private fun addProductToCart(token: String, addToCartRequest: AddToCartRequest) {
-        with(detailViewModel) {
-            addToCart(token, addToCartRequest)
-            cartItem.observe(viewLifecycleOwner) {
-                Timber.tag(TAG).d("addToCart: " + it)
-                Toast.makeText(context, "Thêm vào giỏ hàng thành công", Toast.LENGTH_SHORT).show()
-                progressDialog.stop()
-            }
-            errorMessage.observe(viewLifecycleOwner) {
-                progressDialog.stop()
-                Timber.tag(TAG).d("addToCart: " + it)
-                Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
-            }
-            loading.observe(viewLifecycleOwner) {
-                if (it) progressDialog.start("Loading....")
-            }
-        }
+        detailViewModel.addToCart(token, addToCartRequest)
     }
 
 

@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.duongnd.ecommerceapp.R
 import com.duongnd.ecommerceapp.databinding.FragmentAccountBinding
+import com.duongnd.ecommerceapp.ui.checkout.fragment.AddressFragment
 import com.duongnd.ecommerceapp.ui.order.OrderFragment
 import com.google.android.material.tabs.TabLayoutMediator
 
@@ -32,6 +33,13 @@ class AccountFragment : Fragment() {
                .replace(R.id.fragment_container_view_main_activity, OrderFragment())
                .addToBackStack(OrderFragment::class.java.simpleName)
                .commit()
+        }
+
+        binding.layoutAddress.setOnClickListener {
+            requireActivity().supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container_view_main_activity, AddressFragment())
+                .addToBackStack(AddressFragment::class.java.simpleName)
+                .commit()
         }
     }
 

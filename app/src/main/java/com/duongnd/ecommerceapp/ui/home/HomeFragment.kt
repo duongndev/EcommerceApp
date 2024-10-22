@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.duongnd.ecommerceapp.R
 import com.duongnd.ecommerceapp.adapter.HomeAdapter
@@ -19,9 +20,11 @@ import com.duongnd.ecommerceapp.databinding.FragmentHomeBinding
 import com.duongnd.ecommerceapp.ui.bottomsheet.FilterBottomSheetFragment
 import com.duongnd.ecommerceapp.ui.detail.DetailFragment
 import com.duongnd.ecommerceapp.utils.SessionManager
+import com.duongnd.ecommerceapp.utils.UiState
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
@@ -58,6 +61,7 @@ class HomeFragment : Fragment() {
 
         showLoading(true)
         binding.chipGroup.addChip(requireContext(), "All")
+        getAllCategory()
         val firstChip: Chip = binding.chipGroup.getChildAt(0) as Chip
         firstChip.isChecked = true
 
@@ -86,11 +90,25 @@ class HomeFragment : Fragment() {
                     showLoading(true)
                     val name = chip.text.toString()
                     productList.clear()
-                    updateDataRecyclerViewByCategory(name)
+                    getProductsByCategory(name)
                 }
             }
         }
 
+        adapterListener()
+
+        binding.btnFitter.setOnClickListener {
+            val filterBottomSheetFragment = FilterBottomSheetFragment()
+            filterBottomSheetFragment.show(
+                parentFragmentManager,
+                FilterBottomSheetFragment::class.java.simpleName
+            )
+        }
+
+
+    }
+
+    private fun adapterListener() {
         homeAdapter.clickToSaved = { click, product ->
             val imageButton = click as ImageButton
             if (isImageHeartSelected) {
@@ -133,14 +151,32 @@ class HomeFragment : Fragment() {
                 .commit()
         }
 
-        binding.btnFitter.setOnClickListener {
-            val filterBottomSheetFragment = FilterBottomSheetFragment()
-            filterBottomSheetFragment.show(
-                parentFragmentManager,
-                FilterBottomSheetFragment::class.java.simpleName
-            )
-        }
+    }
 
+    private fun getAllCategory() {
+        lifecycleScope.launch {
+            viewModel.loadCategories()
+            viewModel.categoriesList.collect { uiState ->
+                when (uiState) {
+                    is UiState.Loading -> {
+                        showLoading(true)
+                    }
+
+                    is UiState.Success -> {
+                        showLoading(false)
+                        val categories = uiState.data
+                        for (category in categories) {
+                            binding.chipGroup.addChip(requireContext(), category)
+                        }
+                    }
+
+                    is UiState.Error -> {
+                        showLoading(false)
+                        Toast.makeText(requireContext(), "Error", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
     }
 
 
@@ -166,48 +202,56 @@ class HomeFragment : Fragment() {
 
     }
 
+    private fun getProductsByCategory(category: String) {
+        lifecycleScope.launch {
+            viewModel.getProductCategory(category)
+            viewModel.productsCategoryList.collect { uiState ->
+                when (uiState) {
+                    is UiState.Loading -> {
+                        showLoading(true)
+                    }
+
+                    is UiState.Success -> {
+                        showLoading(false)
+                        productList.clear()
+                        productList.addAll(uiState.data)
+                        homeAdapter.notifyDataSetChanged()
+                    }
+
+                    is UiState.Error -> {
+                        showLoading(false)
+                        Toast.makeText(requireContext(), "Error", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
+    }
+
     private fun getAllProducts() {
-        with(viewModel) {
-            loadProductsList()
-            productsList.observe(viewLifecycleOwner) {
-                Log.d(TAG, "observeData: $it")
-                productList.clear()
-                productList.addAll(it)
-                homeAdapter.notifyDataSetChanged()
+        lifecycleScope.launch {
+            viewModel.loadProductsList()
+            viewModel.productsList.collect { uiState ->
+                when (uiState) {
+                    is UiState.Loading -> {
+                        showLoading(true)
+                    }
 
-                showLoading(false)
-            }
-            errorMessage.observe(viewLifecycleOwner) {
-                Log.d(TAG, "observeDataError: $it")
-                Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
-            }
-            loading.observe(viewLifecycleOwner) {
-                Log.d(TAG, "observeDataLoading: $it")
-                showLoading(it)
+                    is UiState.Success -> {
+                        showLoading(false)
+                        productList.clear()
+                        productList.addAll(uiState.data)
+                        homeAdapter.notifyDataSetChanged()
+                    }
+
+                    is UiState.Error -> {
+                        showLoading(false)
+                        Toast.makeText(requireContext(), "Error", Toast.LENGTH_SHORT).show()
+                    }
+                }
             }
         }
     }
 
-
-    private fun updateDataRecyclerViewByCategory(name: String) {
-        with(viewModel) {
-            loadProductByCategoryName(name)
-            productsList.observe(viewLifecycleOwner) {
-                Log.d(TAG, "observeData: $it")
-                productList.clear()
-                productList.addAll(it)
-                homeAdapter.notifyDataSetChanged()
-                showLoading(false)
-            }
-            errorMessage.observe(viewLifecycleOwner) {
-                Log.d(TAG, "observeDataError: $it")
-            }
-            loading.observe(viewLifecycleOwner) {
-                Log.d(TAG, "observeDataLoading: $it")
-                showLoading(it)
-            }
-        }
-    }
 
     private fun showLoading(isLoading: Boolean) {
         binding.shimmerFrameLayout.visibility = if (isLoading) View.VISIBLE else View.GONE

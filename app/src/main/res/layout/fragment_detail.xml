@@ -297,7 +297,7 @@
             android:maxLines="1"
             android:text="100.000đ"
             android:textColor="@color/primary900"
-            android:textSize="20sp" />
+            android:textSize="16sp" />
 
         <Button
             android:id="@+id/btn_add_to_cart"

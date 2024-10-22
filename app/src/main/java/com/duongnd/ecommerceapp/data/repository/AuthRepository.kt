@@ -1,11 +1,10 @@
 package com.duongnd.ecommerceapp.data.repository
 
-import com.duongnd.ecommerceapp.data.api.ApiResponse
 import com.duongnd.ecommerceapp.data.api.EcommerceApiService
-import com.duongnd.ecommerceapp.data.model.cart.Cart
 import com.duongnd.ecommerceapp.data.model.login.DataLogin
 import com.duongnd.ecommerceapp.data.model.login.LoginRequest
-import com.duongnd.ecommerceapp.utils.Resource
+import com.duongnd.ecommerceapp.data.model.user.UsersItem
+import com.duongnd.ecommerceapp.utils.UiState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -14,13 +13,36 @@ import javax.inject.Inject
 
 class AuthRepository @Inject constructor(
     private val ecommerceApiService: EcommerceApiService
-) : ApiResponse() {
+) {
 
-    suspend fun getLogin(loginRequest: LoginRequest): Flow<Resource<DataLogin>> {
+    suspend fun getLogin(loginRequest: LoginRequest): Flow<UiState<DataLogin>> {
         return flow {
-            emit(safeApiCallLogin {
-                ecommerceApiService.loginUser(loginRequest)
-            })
+            try {
+                val response = ecommerceApiService.loginUser(loginRequest)
+                if (response.isSuccessful) {
+                    response.body()?.let {
+                        emit(UiState.Success(it))
+                    }
+                }
+            } catch (e: Exception) {
+                emit(UiState.Error(e.message.toString()))
+            }
+        }.flowOn(Dispatchers.IO)
+    }
+
+
+    suspend fun checkUser(token: String): Flow<UiState<UsersItem>> {
+        return flow {
+            try {
+                val response = ecommerceApiService.checkUser("Bearer $token")
+                if (response.isSuccessful) {
+                    response.body()?.let {
+                        emit(UiState.Success(it))
+                    }
+                }
+            } catch (e: Exception) {
+                emit(UiState.Error(e.message.toString()))
+            }
         }.flowOn(Dispatchers.IO)
     }
 

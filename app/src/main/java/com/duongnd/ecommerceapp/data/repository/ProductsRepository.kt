@@ -3,10 +3,9 @@ package com.duongnd.ecommerceapp.data.repository
 import com.duongnd.ecommerceapp.data.api.ApiResponse
 import com.duongnd.ecommerceapp.data.api.EcommerceApiService
 import com.duongnd.ecommerceapp.data.model.cart.Cart
-import com.duongnd.ecommerceapp.data.model.product.Product
 import com.duongnd.ecommerceapp.data.model.product.ProductItem
 import com.duongnd.ecommerceapp.data.request.AddToCartRequest
-import com.duongnd.ecommerceapp.utils.Resource
+import com.duongnd.ecommerceapp.utils.UiState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -16,36 +15,125 @@ import javax.inject.Inject
 class ProductsRepository @Inject constructor(
     private val ecommerceApiService: EcommerceApiService
 ) : ApiResponse() {
-    suspend fun getAllProducts(): Flow<Resource<Product>> {
+
+    val allProducts = mutableListOf<ProductItem>()
+    val allCategories = mutableListOf<String>()
+    val allCartItems = mutableListOf<Cart>()
+
+    suspend fun getAllProducts(): Flow<UiState<List<ProductItem>>> {
         return flow {
-            emit(safeApiCallProducts {
-                ecommerceApiService.getAllProducts()
-            })
+            try {
+                val response = ecommerceApiService.getAllProducts()
+                if (response.isSuccessful) {
+                    response.body()?.let {
+                        allProducts.clear()
+                        allProducts.addAll(it)
+                        emit(UiState.Success(allProducts))
+                    }
+                    if (allProducts.isNotEmpty()) {
+                        emit(UiState.Success(allProducts.toList()))
+                    } else {
+                        emit(UiState.Error("No data"))
+                    }
+                } else {
+                    emit(UiState.Error("Network call failed with ${response.message()}, ${response.errorBody()}"))
+                }
+
+            } catch (e: Exception) {
+                emit(UiState.Error(e.message.toString()))
+            }
         }.flowOn(Dispatchers.IO)
     }
 
-    suspend fun getProductById(id: String): Flow<Resource<ProductItem>> {
+    suspend fun getAllCategories(): Flow<UiState<List<String>>> {
         return flow {
-            emit(safeApiCallProductsDetail{
-                ecommerceApiService.getProductById(id)
-            })
+            try {
+                val response = ecommerceApiService.getAllCategories()
+                if (response.isSuccessful) {
+                    response.body()?.let {
+                        allCategories.clear()
+                        allCategories.addAll(it)
+                        emit(UiState.Success(allCategories))
+                    }
+                    if (allCategories.isNotEmpty()) {
+                        emit(UiState.Success(allCategories.toList()))
+                    } else {
+                        emit(UiState.Error("No data"))
+                    }
+
+                } else {
+                    emit(UiState.Error("Network call failed with ${response.message()}, ${response.errorBody()}"))
+                }
+
+            } catch (e: Exception) {
+                emit(UiState.Error(e.message.toString()))
+            }
         }.flowOn(Dispatchers.IO)
     }
 
-    suspend fun getProductsByCategoryName(name: String): Flow<Resource<Product>> {
+
+    suspend fun getProductById(id: String): Flow<UiState<MutableList<ProductItem>>> {
         return flow {
-            emit(safeApiCallProducts{
-                ecommerceApiService.getProductsByCategoryName(name)
-            })
+            try {
+                val response = ecommerceApiService.getProductById(id)
+                if (response.isSuccessful) {
+                    response.body()?.let {
+                        allProducts.clear()
+                        allProducts.add(it)
+                        emit(UiState.Success(allProducts))
+                    }
+                    if (allProducts.isNotEmpty()) {
+                        emit(UiState.Success(allProducts))
+                    } else {
+                        emit(UiState.Error("No data"))
+                    }
+                } else {
+                    emit(UiState.Error("Network call failed with ${response.message()}, ${response.errorBody()}"))
+                }
+            } catch (e: Exception) {
+                emit(UiState.Error(e.message.toString()))
+            }
         }.flowOn(Dispatchers.IO)
     }
 
-    suspend fun addToCart(token: String, addToCartRequest: AddToCartRequest): Flow<Resource<Cart>> {
+    suspend fun addToCart(token: String, addToCartRequest: AddToCartRequest): Flow<UiState<Cart>> {
         return flow {
-            emit(safeApiCallCart {
-                ecommerceApiService.addCart(token, addToCartRequest)
-            })
+            try {
+                val response = ecommerceApiService.addCart(token, addToCartRequest)
+                if (response.isSuccessful) {
+                    response.body()?.let {
+                        emit(UiState.Success(it))
+                    }
+                } else {
+                    emit(UiState.Error("Network call failed with ${response.message()}, ${response.errorBody()}"))
+                }
+            } catch (e: Exception) {
+                emit(UiState.Error(e.message.toString()))
+            }
         }.flowOn(Dispatchers.IO)
     }
 
+    fun getProductByCategory(category: String): Flow<UiState<List<ProductItem>>> {
+        return flow {
+            try {
+                val response = ecommerceApiService.getProductsByCategoryName(category)
+                if (response.isSuccessful) {
+                    response.body()?.let {
+                        allProducts.clear()
+                        allProducts.addAll(it)
+                        emit(UiState.Success(allProducts))
+                    }
+                    if (allProducts.isNotEmpty()) {
+                        emit(UiState.Success(allProducts.toList()))
+                    } else {
+                        emit(UiState.Error("No data"))
+                    }
+                } else {
+                    emit(UiState.Error("Network call failed with ${response.message()}, ${response.errorBody()}"))
+                }
+            } catch (e: Exception) {
+                emit(UiState.Error(e.message.toString()))
+            }
+        }.flowOn(Dispatchers.IO)
+    }
 }

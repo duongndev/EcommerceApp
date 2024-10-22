@@ -1,6 +1,7 @@
 package com.duongnd.ecommerceapp.ui.cart
 
 import android.content.Intent
+import android.icu.text.NumberFormat
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -23,6 +24,7 @@ import com.duongnd.ecommerceapp.utils.CustomProgressDialog
 import com.duongnd.ecommerceapp.utils.SessionManager
 import com.duongnd.ecommerceapp.viewmodel.cart.CartViewModel
 import com.duongnd.ecommerceapp.viewmodel.cart.CartViewModelFactory
+import java.util.Locale
 
 class CartFragment : Fragment() {
 
@@ -110,9 +112,12 @@ class CartFragment : Fragment() {
                     cartItemList.clear()
                     cartItemList.addAll(it.itemsCart)
 
-                    val formatedTotalAmount = String.format("%.2f", it.totalAmount)
 
-                    binding.txtSubtotalValue.text = "$formatedTotalAmount VND"
+                    val locale = Locale("vi", "VN")
+                    val numberFormat = NumberFormat.getInstance(locale)
+                    val formattedPrice = numberFormat.format(it.totalAmount)
+
+                    binding.txtSubtotalValue.text = "$formattedPrice vnđ"
                     cartAdapter.notifyDataSetChanged()
                     progressDialog.stop()
                 }
@@ -147,9 +152,10 @@ class CartFragment : Fragment() {
                     cartId = it._id
                     cartItemList.clear()
                     cartItemList.addAll(it.itemsCart)
-                    val formatPrice = it.totalAmount.toString().replace("\\D+".toRegex(), "")
-                        .toLong().toString().replace("\\B(?=(\\d{2})+(?!\\d))".toRegex(), ",")
-                    binding.txtSubtotalValue.text = "$formatPrice vnđ"
+                    val locale = Locale("vi", "VN")
+                    val numberFormat = NumberFormat.getInstance(locale)
+                    val formattedPrice = numberFormat.format(it.totalAmount)
+                    binding.txtSubtotalValue.text = "$formattedPrice vnđ"
                     cartAdapter.notifyDataSetChanged()
                 }
             }
@@ -180,9 +186,10 @@ class CartFragment : Fragment() {
                     cartId = it._id
                     cartItemList.clear()
                     cartItemList.addAll(it.itemsCart)
-                    val formatPrice = it.totalAmount.toString().replace("\\D+".toRegex(), "")
-                        .toLong().toString().replace("\\B(?=(\\d{3})+(?!\\d))".toRegex(), ",")
-                    binding.txtSubtotalValue.text = "$formatPrice vnđ"
+                    val locale = Locale("vi", "VN")
+                    val numberFormat = NumberFormat.getInstance(locale)
+                    val formattedPrice = numberFormat.format(it.totalAmount)
+                    binding.txtSubtotalValue.text = "$formattedPrice vnđ"
                     cartAdapter.notifyDataSetChanged()
                 }
             }

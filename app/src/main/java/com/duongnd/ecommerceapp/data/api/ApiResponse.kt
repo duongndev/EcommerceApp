@@ -1,6 +1,5 @@
 package com.duongnd.ecommerceapp.data.api
 
-import com.duongnd.ecommerceapp.data.model.address.Address
 import com.duongnd.ecommerceapp.data.model.cart.Cart
 import com.duongnd.ecommerceapp.data.model.goship.GoShipCity
 import com.duongnd.ecommerceapp.data.model.login.DataLogin
@@ -9,6 +8,7 @@ import com.duongnd.ecommerceapp.data.model.product.Product
 import com.duongnd.ecommerceapp.data.model.product.ProductItem
 import com.duongnd.ecommerceapp.data.model.wishlist.Wishlist
 import com.duongnd.ecommerceapp.utils.Resource
+import com.duongnd.ecommerceapp.utils.UiState
 import retrofit2.Response
 import timber.log.Timber
 
@@ -34,19 +34,19 @@ abstract class ApiResponse {
 
     suspend fun safeApiCallProducts(
         apiCall: suspend () -> Response<Product>
-    ): Resource<Product> {
+    ): UiState<Product> {
         try {
             Timber.tag("ApiResponse").d("checking...")
             val response = apiCall()
             if (response.isSuccessful) {
                 val body = response.body()
                 body?.let {
-                    return Resource.Success(body)
+                    return UiState.Success(it)
                 }
             }
-            return error("${response.code()} ${response.message()}")
+            return  UiState.Error(response.message())
         } catch (e: Exception) {
-            return error(e.message ?: e.toString())
+            return  UiState.Error(e.message ?: e.toString())
         }
     }
 
@@ -103,25 +103,6 @@ abstract class ApiResponse {
             return error(e.message ?: e.toString())
         }
     }
-
-    suspend fun safeApiCallAddress(
-        apiCall: suspend () -> Response<Address>
-    ): Resource<Address> {
-        try {
-            Timber.tag("ApiResponse").d("checking...")
-            val response = apiCall()
-            if (response.isSuccessful) {
-                val body = response.body()
-                body?.let {
-                    return Resource.Success(body)
-                }
-            }
-            return error("${response.code()} ${response.message()}")
-        } catch (e: Exception) {
-            return error(e.message ?: e.toString())
-        }
-    }
-
     suspend fun safeApiCallWishlist(
         apiCall: suspend () -> Response<Wishlist>
     ): Resource<Wishlist> {

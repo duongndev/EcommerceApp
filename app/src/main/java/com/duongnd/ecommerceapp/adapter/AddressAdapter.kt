@@ -8,7 +8,7 @@ import android.widget.RadioButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.duongnd.ecommerceapp.R
-import com.duongnd.ecommerceapp.data.model.address.AddressItem
+import com.duongnd.ecommerceapp.data.model.user.address.AddressItem
 
 class AddressAdapter(
     private val itemsAddressList: MutableList<AddressItem>,
@@ -18,7 +18,6 @@ class AddressAdapter(
     private var selectedPosition = -1
 
     class AddressViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val txtTitleAddress: TextView = itemView.findViewById(R.id.txt_item_title_address)
         val txtAddressLine: TextView = itemView.findViewById(R.id.txt_item_address_line)
         val txtAddressPhone: TextView = itemView.findViewById(R.id.txt_item_address_phone)
         val radioButton: RadioButton = itemView.findViewById(R.id.radio_button_selected_address)
@@ -33,9 +32,7 @@ class AddressAdapter(
     @SuppressLint("RecyclerView")
     override fun onBindViewHolder(holder: AddressViewHolder,  position: Int) {
         val address = itemsAddressList[position]
-        holder.txtTitleAddress.text = address.title
-        holder.txtAddressLine.text = address.addressLine
-        holder.txtAddressPhone.text = address.phoneNumber
+        holder.txtAddressLine.text = address.street
 
         holder.radioButton.isChecked = position == selectedPosition
         holder.radioButton.setOnClickListener {

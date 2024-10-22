@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +11,7 @@ import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.duongnd.ecommerceapp.R
 import com.duongnd.ecommerceapp.data.model.login.LoginRequest
 import com.duongnd.ecommerceapp.data.repository.AuthRepository
@@ -20,9 +20,12 @@ import com.duongnd.ecommerceapp.di.AppModule
 import com.duongnd.ecommerceapp.ui.MainActivity
 import com.duongnd.ecommerceapp.utils.CustomProgressDialog
 import com.duongnd.ecommerceapp.utils.SessionManager
+import com.duongnd.ecommerceapp.utils.UiState
 import com.duongnd.ecommerceapp.view.auth.signup.SignupFragment
 import com.duongnd.ecommerceapp.viewmodel.auth.login.LoginViewModel
 import com.duongnd.ecommerceapp.viewmodel.auth.login.LoginViewModelFactory
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 class LoginFragment : Fragment() {
 
@@ -105,29 +108,27 @@ class LoginFragment : Fragment() {
     }
 
     private fun getLogin(loginRequest: LoginRequest) {
-        with(loginViewModel){
-            loginUser(loginRequest)
-            dataLogin.observe(viewLifecycleOwner){
+        lifecycleScope.launch {
+            loginViewModel.loginUser(loginRequest)
+            loginViewModel.dataLogin.collectLatest { state ->
+                when (state) {
+                    is UiState.Loading -> {
+                        progressDialog.start("Loading...")
+                    }
 
-                    binding.edtEmailLogin.setText("")
-                    binding.edtPasswordLogin.setText("")
-                    binding.inputLayoutEmailLogin.error = null
-                    binding.inputLayoutPasswordLogin.error = null
-                    sessionManager.setToken(it.token)
-                    startActivity(Intent(requireContext(), MainActivity::class.java))
-                    requireActivity().finish()
-                    progressDialog.stop()
-            }
-            loading.observe(viewLifecycleOwner){
-                progressDialog.stop()
-                if(it) progressDialog.start("Loading...")
-            }
-            errorMessage.observe(viewLifecycleOwner){
-                progressDialog.stop()
-                Toast.makeText(context, "Wrong email or password", Toast.LENGTH_SHORT).show()
-                Log.e(TAG, "getLogin: $it")
-            }
+                    is UiState.Error -> {
+                        progressDialog.stop()
+                        Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
+                    }
 
+                    is UiState.Success -> {
+                        progressDialog.stop()
+                        sessionManager.setToken(state.data.token)
+                        startActivity(Intent(requireContext(), MainActivity::class.java))
+                        requireActivity().finish()
+                    }
+                }
+            }
         }
     }
 

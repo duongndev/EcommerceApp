@@ -24,10 +24,10 @@
 
         <LinearLayout
             android:id="@+id/layout_item_address"
-            android:layout_width="wrap_content"
+            android:layout_width="211dp"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
             android:layout_marginStart="16sp"
+            android:layout_centerVertical="true"
             android:layout_marginEnd="10dp"
             android:layout_toStartOf="@+id/radio_button_selected_address"
             android:layout_toEndOf="@id/img_location"
@@ -35,20 +35,11 @@
             android:padding="3dp">
 
             <TextView
-                android:id="@+id/txt_item_title_address"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/general_sans_semibold"
-                android:text="Home"
-                android:textColor="@color/primary900"
-                android:textSize="14sp" />
-
-            <TextView
                 android:id="@+id/txt_item_address_line"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:maxLines="1"
                 android:fontFamily="@font/general_sans_regular"
+                android:maxLines="1"
                 android:text="123 Street, City, Country"
                 android:textColor="@color/primary900"
                 android:textSize="12sp" />

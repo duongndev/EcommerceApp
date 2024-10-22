@@ -18,6 +18,7 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.duongnd.ecommerceapp.R
 import com.duongnd.ecommerceapp.data.model.product.ProductItem
+import com.duongnd.ecommerceapp.utils.FormatPrice
 import java.util.Locale
 
 class HomeAdapter(private val productList: List<ProductItem>, private val context: Context) :
@@ -48,7 +49,12 @@ class HomeAdapter(private val productList: List<ProductItem>, private val contex
         val locale = Locale("vi", "VN")
         val numberFormat = NumberFormat.getInstance(locale)
         val formattedPrice = numberFormat.format(product.product_price)
-        holder.txtPriceProduct.text = "$formattedPrice vnđ"
+
+//        holder.txtPriceProduct.text = "$formattedPrice vnđ"
+
+        val formatPrice = FormatPrice.formatPriceVN(product.product_price)
+        holder.txtPriceProduct.text = "$formatPrice"
+
 
         val imgUrl = product.imageUrls
 
